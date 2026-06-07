@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useUser, useClerk, SignIn } from "@clerk/clerk-react";
 
 // ============ BACKEND ============
 const API_URL = "https://dreams-come-true-backend.onrender.com";
@@ -867,22 +868,37 @@ function UniversoScreen({ dreams, currentUserId }) {
 // ============ PROFILE SCREEN ============
 function ProfileScreen({ user, onUpgrade }) {
   const [showSettings, setShowSettings] = useState(false);
+  const { signOut } = useClerk();
 
   return (
     <div style={{ padding: "20px 0" }}>
       {/* Avatar section */}
       <div style={{ textAlign: "center", padding: "20px 24px 32px" }}>
-        <div style={{
-          width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px",
-          background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 36, color: "white", fontWeight: 300, fontFamily: "Georgia, serif",
-          boxShadow: "0 12px 36px rgba(153,102,255,0.3)"
-        }}>{user.name.charAt(0).toUpperCase()}</div>
+        {user.imageUrl ? (
+          <img
+            src={user.imageUrl}
+            alt={user.name}
+            style={{
+              width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px", display: "block",
+              objectFit: "cover", border: "2px solid rgba(179,136,255,0.4)",
+              boxShadow: "0 12px 36px rgba(153,102,255,0.3)"
+            }}
+          />
+        ) : (
+          <div style={{
+            width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px",
+            background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 36, color: "white", fontWeight: 300, fontFamily: "Georgia, serif",
+            boxShadow: "0 12px 36px rgba(153,102,255,0.3)"
+          }}>{user.name.charAt(0).toUpperCase()}</div>
+        )}
         <div style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 300, color: "#f5f0ff", marginBottom: 4 }}>
           {user.name}
         </div>
-        <div style={{ fontSize: 12, color: "rgba(184,168,216,0.5)" }}>@{user.name.toLowerCase().replace(/\s/g, "_")}</div>
+        <div style={{ fontSize: 12, color: "rgba(184,168,216,0.5)", marginBottom: 4 }}>
+          {user.email}
+        </div>
       </div>
 
       {/* Plan card */}
@@ -943,6 +959,21 @@ function ProfileScreen({ user, onUpgrade }) {
         ))}
       </div>
 
+      {/* Cerrar sesión */}
+      <div style={{ padding: "16px 16px 0" }}>
+        <button
+          onClick={() => signOut()}
+          style={{
+            width: "100%", padding: "14px", borderRadius: 14, cursor: "pointer",
+            background: "rgba(255,80,80,0.08)", border: "0.5px solid rgba(255,80,80,0.2)",
+            color: "rgba(255,120,120,0.85)", fontSize: 14, fontWeight: 500,
+            fontFamily: "inherit", transition: "all 0.3s"
+          }}
+        >
+          Cerrar sesión
+        </button>
+      </div>
+
       <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: "rgba(184,168,216,0.25)" }}>
         Dreams Come True · v1.2.0<br />Hecho con magia ✨ en México
       </div>
@@ -950,15 +981,101 @@ function ProfileScreen({ user, onUpgrade }) {
   );
 }
 
+// ============ LOGIN SCREEN ============
+function LoginScreen() {
+  return (
+    <div style={{
+      minHeight: "100vh", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", padding: "40px 24px",
+      background: "#000", position: "relative", overflow: "hidden"
+    }}>
+      <Nebula />
+      <Stars />
+      <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: 380, textAlign: "center" }}>
+        {/* Logo / título */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>✦</div>
+          <div style={{
+            fontFamily: "Georgia, serif", fontSize: 36, fontWeight: 300,
+            background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            marginBottom: 8
+          }}>Dreams Come True</div>
+          <div style={{ fontSize: 14, color: "rgba(184,168,216,0.6)", fontStyle: "italic" }}>
+            Materializa tus sueños con IA
+          </div>
+        </div>
+
+        {/* Componente de login de Clerk */}
+        <div style={{ borderRadius: 20, overflow: "hidden" }}>
+          <SignIn
+            appearance={{
+              variables: {
+                colorPrimary: "#9966ff",
+                colorBackground: "#0d0d1a",
+                colorText: "#f5f0ff",
+                colorTextSecondary: "rgba(184,168,216,0.7)",
+                colorInputBackground: "rgba(255,255,255,0.05)",
+                colorInputText: "#f5f0ff",
+                borderRadius: "14px",
+                fontFamily: "Inter, sans-serif",
+              },
+              elements: {
+                card: { background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.08)", boxShadow: "none" },
+                headerTitle: { color: "#f5f0ff" },
+                headerSubtitle: { color: "rgba(184,168,216,0.6)" },
+                socialButtonsBlockButton: {
+                  background: "rgba(255,255,255,0.05)",
+                  border: "0.5px solid rgba(255,255,255,0.1)",
+                  color: "#f5f0ff",
+                },
+                dividerLine: { background: "rgba(255,255,255,0.08)" },
+                dividerText: { color: "rgba(184,168,216,0.4)" },
+                formButtonPrimary: { background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)", border: "none" },
+                footerActionLink: { color: "#b388ff" },
+              }
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============ MAIN APP ============
 export default function DreamsComeTrue() {
+  const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const [tab, setTab] = useState("sonar");
-  const [user, setUser] = useLocalStorage("dreamUser", {
-    name: "Carlos",
+
+  // Construimos el objeto "user" de la app a partir del usuario real de Clerk
+  const user = useMemo(() => ({
+    id: clerkUser?.id || "",
+    name: clerkUser?.fullName || clerkUser?.firstName || clerkUser?.emailAddresses?.[0]?.emailAddress || "Soñador",
+    email: clerkUser?.emailAddresses?.[0]?.emailAddress || "",
+    imageUrl: clerkUser?.imageUrl || null,
     plan: "free",
-    credits: 1
-  });
-  const [dreams, setDreams] = useLocalStorage("dreams", []);
+    credits: 1,
+  }), [clerkUser]);
+
+  const [userExtras, setUserExtras] = useLocalStorage(`dreamUser_${user.id}`, { plan: "free", credits: 1 });
+  const fullUser = useMemo(() => ({ ...user, ...userExtras }), [user, userExtras]);
+
+  const [dreams, setDreams] = useLocalStorage(`dreams_${user.id}`, []);
+
+  // Mientras Clerk carga, mostramos spinner
+  if (!isLoaded) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#000", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Nebula /><Stars />
+        <div style={{ position: "relative", zIndex: 2, color: "rgba(184,168,216,0.5)", fontStyle: "italic" }}>Cargando...</div>
+      </div>
+    );
+  }
+
+  // Si no hay sesión, mostramos el login
+  if (!isSignedIn) {
+    return <LoginScreen />;
+  }
 
   const tabs = [
     { id: "sonar", icon: "🌙", label: "Soñar" },
@@ -968,14 +1085,14 @@ export default function DreamsComeTrue() {
   ];
 
   const handleDreamCreated = useCallback((dream, updatedUser) => {
-    setDreams([dream, ...dreams]);
-    setUser(updatedUser);
-  }, [dreams, setDreams, setUser]);
+    setDreams(prev => [dream, ...prev]);
+    setUserExtras({ plan: updatedUser.plan, credits: updatedUser.credits });
+  }, [setDreams, setUserExtras]);
 
   const handleUpgrade = useCallback(() => {
     alert("En la versión real conectaría con Stripe para pagos reales.");
-    setUser({ ...user, plan: "soñador", credits: 3 });
-  }, [user, setUser]);
+    setUserExtras({ plan: "soñador", credits: 3 });
+  }, [setUserExtras]);
 
   return (
     <div style={{
@@ -999,10 +1116,10 @@ export default function DreamsComeTrue() {
       `}</style>
 
       <div style={{ position: "relative", zIndex: 2, paddingBottom: 100, minHeight: "100vh" }}>
-        {tab === "sonar" && <SonarScreen user={user} onDreamCreated={handleDreamCreated} />}
+        {tab === "sonar" && <SonarScreen user={fullUser} onDreamCreated={handleDreamCreated} />}
         {tab === "diario" && <DiarioScreen dreams={dreams} />}
-        {tab === "universo" && <UniversoScreen dreams={dreams} currentUserId={user.id} />}
-        {tab === "yo" && <ProfileScreen user={user} onUpgrade={handleUpgrade} />}
+        {tab === "universo" && <UniversoScreen dreams={dreams} currentUserId={fullUser.id} />}
+        {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} />}
       </div>
 
       {/* Bottom tab bar */}
