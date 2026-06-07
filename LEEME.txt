@@ -1,0 +1,47 @@
+# Como correr Dreams Come True en tu compu
+
+Sigue estos pasos. Es facil.
+
+## PASO 1 — Descomprime esta carpeta
+Si descargaste un ZIP, descomprimelo. Tendras una carpeta llamada "dreams-app-local".
+
+## PASO 2 — Abre la terminal en esa carpeta
+
+**En Windows:**
+1. Abre la carpeta "dreams-app-local"
+2. En la barra de direccion de arriba (donde dice la ruta), borra todo y escribe: cmd
+3. Presiona Enter
+4. Se abre una ventana negra (la terminal) ya en la carpeta correcta
+
+## PASO 3 — Instala (solo la primera vez)
+En la terminal escribe esto y presiona Enter:
+
+```
+npm install
+```
+
+Espera 1-2 minutos. Va a descargar lo necesario.
+
+## PASO 4 — Arranca la app
+En la terminal escribe esto y presiona Enter:
+
+```
+npm run dev
+```
+
+Se va a abrir tu navegador solo, con la app funcionando.
+Si no se abre solo, abre tu navegador y ve a: http://localhost:3000
+
+## PASO 5 — Prueba Veo
+Ahora SI la app puede llamar al backend.
+- Ve a "Yo" y activa el plan Sonador
+- Vuelve a "Sonar"
+- Escribe un sueno, elige estilo
+- Toca "Materializar sueno"
+- Espera 1-3 minutos (el orbe gira mientras Veo trabaja)
+
+## PARA DETENER LA APP
+En la terminal presiona: Ctrl + C
+
+## SI ALGO FALLA
+Copia el mensaje de error de la terminal y mandamelo.
