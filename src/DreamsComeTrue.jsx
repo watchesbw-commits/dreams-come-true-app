@@ -4,7 +4,6 @@ import { useUser, useClerk, SignIn } from "@clerk/clerk-react";
 // ============ BACKEND ============
 const API_URL = import.meta.env.VITE_BACKEND_URL || "https://dreams-come-true-backend.onrender.com";
 
-// Función para llamar al backend (incluye _status HTTP en la respuesta)
 async function callAPI(endpoint, method = "GET", body = null) {
   try {
     const options = {
@@ -23,33 +22,44 @@ async function callAPI(endpoint, method = "GET", body = null) {
 
 // ============ DATA & CONSTANTS ============
 const STYLES = [
-  { id: "real", name: "Realista", icon: "📷", colors: ["#cccccc", "#ffaa66"] },
-  { id: "anime", name: "Anime", icon: "⛩", colors: ["#ff5577", "#6633cc"] },
-  { id: "cyber", name: "Cyberpunk", icon: "⚡", colors: ["#ff3399", "#3366ff"] },
-  { id: "fantasy", name: "Fantasy", icon: "🌲", colors: ["#9966ff", "#66ccff"] },
-  { id: "ghibli", name: "Ghibli", icon: "🌿", colors: ["#66cc99", "#ffcc66"] },
-  { id: "acuarela", name: "Acuarela", icon: "🎨", colors: ["#ffaadd", "#aaddff"] },
-  { id: "pixel", name: "Pixel Art", icon: "🕹", colors: ["#00ddaa", "#ffdd00"] },
-  { id: "terror", name: "Terror", icon: "🌑", colors: ["#663366", "#1a0033"] },
-];
-
-const DURATIONS = [
-  { sec: 8, price: 4.99, credits: 1 },
-  { sec: 16, price: 8.99, credits: 2 },
-  { sec: 24, price: 12.99, credits: 3 },
-  { sec: 32, price: 17.99, credits: 4 },
+  { id: "real",       name: "Realista",   icon: "📷", colors: ["#cccccc", "#ffaa66"], prompt: "realistic, cinematic, photorealistic" },
+  { id: "anime",      name: "Anime",      icon: "⛩",  colors: ["#ff5577", "#6633cc"], prompt: "anime style, hand drawn animation" },
+  { id: "cyber",      name: "Cyberpunk",  icon: "⚡",  colors: ["#ff3399", "#3366ff"], prompt: "cyberpunk, neon lights, futuristic city" },
+  { id: "fantasy",    name: "Fantasy",    icon: "🌲", colors: ["#9966ff", "#66ccff"], prompt: "fantasy, magical, ethereal, enchanted" },
+  { id: "ghibli",     name: "Ghibli",     icon: "🍃", colors: ["#66cc99", "#ffcc66"], prompt: "Studio Ghibli style, whimsical, soft colors" },
+  { id: "acuarela",   name: "Acuarela",   icon: "🎨", colors: ["#ffaadd", "#aaddff"], prompt: "watercolor art style, soft brushstrokes" },
+  { id: "pixel",      name: "Pixel Art",  icon: "🕹", colors: ["#00ddaa", "#ffdd00"], prompt: "pixel art style, retro game aesthetic" },
+  { id: "terror",     name: "Terror",     icon: "👻", colors: ["#663366", "#1a0033"], prompt: "horror, dark, eerie, shadows" },
+  { id: "scifi",      name: "Sci-Fi",     icon: "🚀", colors: ["#003399", "#00ccff"], prompt: "science fiction, space, futuristic" },
+  { id: "naturaleza", name: "Naturaleza", icon: "🌿", colors: ["#1a4a1a", "#66cc44"], prompt: "nature, forest, peaceful, green" },
 ];
 
 const INTERPRETATIONS = {
-  cyber: "Tu mente busca libertad y rebeldía. El neón representa tus ambiciones brillantes en un mundo complejo.",
-  anime: "Eres un guerrero espiritual. Refleja tu determinación para superar obstáculos.",
-  ghibli: "Hay paz y magia en tu interior. Buscas conexión con la naturaleza.",
-  fantasy: "Tu imaginación es tu mayor fortaleza. Potencial ilimitado esperando ser despertado.",
-  terror: "Enfrentas miedos internos que necesitan ser reconocidos.",
-  real: "Buscas claridad y verdad sin filtros.",
-  acuarela: "Eres un artista. Tu creatividad fluye naturalmente.",
-  pixel: "Hay nostalgia y autenticidad en tu corazón.",
+  cyber:      "Tu mente busca libertad y rebeldía. El neón representa tus ambiciones brillantes en un mundo complejo.",
+  anime:      "Eres un guerrero espiritual. Refleja tu determinación para superar obstáculos.",
+  ghibli:     "Hay paz y magia en tu interior. Buscas conexión con la naturaleza.",
+  fantasy:    "Tu imaginación es tu mayor fortaleza. Potencial ilimitado esperando ser despertado.",
+  terror:     "Enfrentas miedos internos que necesitan ser reconocidos.",
+  real:       "Buscas claridad y verdad sin filtros.",
+  acuarela:   "Eres un artista. Tu creatividad fluye naturalmente.",
+  pixel:      "Hay nostalgia y autenticidad en tu corazón.",
+  scifi:      "Tu mente viaja hacia el futuro. La ciencia y el misterio del universo te fascinan.",
+  naturaleza: "Tu alma encuentra paz en lo natural. La tierra y el bosque son tu refugio.",
 };
+
+const SUGGESTIONS = [
+  "Volaba sobre el océano al amanecer",
+  "Me perseguía una sombra en un bosque",
+  "Flotaba entre nubes de colores",
+  "Exploraba una ciudad sumergida",
+];
+
+const GENERATING_MESSAGES = [
+  "Pintando los colores de tu sueño...",
+  "Dando vida a tu imaginación...",
+  "Tu sueño está tomando forma...",
+  "Casi listo, tu sueño despierta...",
+];
 
 // ============ UTILS ============
 const useLocalStorage = (key, initialValue) => {
@@ -126,47 +136,24 @@ function DreamCard({ colors, children, style: extraStyle = {} }) {
   );
 }
 
-// Botón reutilizable
 function Button({ children, onClick, variant = "primary", style: extraStyle = {} }) {
   const baseStyle = {
     padding: "14px 24px", borderRadius: 14, border: "none", cursor: "pointer",
     fontSize: 14, fontWeight: 500, transition: "all 0.3s",
     fontFamily: "inherit"
   };
-
   const variants = {
-    primary: {
-      ...baseStyle,
-      background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
-      color: "white",
-      boxShadow: "0 8px 24px rgba(153,102,255,0.3)"
-    },
-    secondary: {
-      ...baseStyle,
-      background: "rgba(255,255,255,0.03)",
-      border: "0.5px solid rgba(255,255,255,0.08)",
-      color: "rgba(245,240,255,0.8)"
-    },
-    ghost: {
-      ...baseStyle,
-      background: "transparent",
-      color: "rgba(184,168,216,0.7)",
-      padding: "8px 12px"
-    }
+    primary: { ...baseStyle, background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)", color: "white", boxShadow: "0 8px 24px rgba(153,102,255,0.3)" },
+    secondary: { ...baseStyle, background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.08)", color: "rgba(245,240,255,0.8)" },
+    ghost: { ...baseStyle, background: "transparent", color: "rgba(184,168,216,0.7)", padding: "8px 12px" }
   };
-
-  return (
-    <button onClick={onClick} style={{ ...variants[variant], ...extraStyle }}>
-      {children}
-    </button>
-  );
+  return <button onClick={onClick} style={{ ...variants[variant], ...extraStyle }}>{children}</button>;
 }
 
 // ============ SOÑAR SCREEN ============
 function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubscribe, subscriptionMessage }) {
   const [dreamText, setDreamText] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("cyber");
-  const [selectedDuration, setSelectedDuration] = useState(30);
   const [isPublic, setIsPublic] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [showResult, setShowResult] = useState(false);
@@ -179,33 +166,29 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
   const canGenerate = useMemo(() => {
     if (showSubscribeButton) return false;
-    if (user.plan === "free") {
-      const duration = DURATIONS.find(d => d.sec === selectedDuration);
-      return user.credits >= (duration?.credits || 0);
-    }
     return true;
-  }, [user, selectedDuration, showSubscribeButton]);
+  }, [showSubscribeButton]);
 
   const handleGenerate = useCallback(async () => {
     if (!dreamText.trim()) {
       setError("Cuéntame tu sueño primero");
       return;
     }
-
     if (!canGenerate) {
-      const duration = DURATIONS.find(d => d.sec === selectedDuration);
-      setError(`Necesitas ${duration?.credits} créditos`);
+      setError("Necesitas suscripción activa con créditos");
       return;
     }
 
     setError("");
     setGenerating(true);
 
-    // 1. Pedir a Veo que empiece. Reintentamos por si el servidor estaba dormido.
+    const styleData = getStyleById(selectedStyle);
+    const fullPrompt = styleData?.prompt ? `${dreamText}, ${styleData.prompt}` : dreamText;
+
     let startResp = null;
     for (let attempt = 0; attempt < 4; attempt++) {
       startResp = await callAPI("/api/dreams/generate", "POST", {
-        text: dreamText,
+        text: fullPrompt,
         style: selectedStyle,
         userId: user.id,
       });
@@ -214,8 +197,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         setError("Ya usaste tus 3 sueños de este mes");
         return;
       }
-      if (startResp?.operationName) break; // arrancó bien
-      await new Promise(r => setTimeout(r, 8000)); // esperar y reintentar
+      if (startResp?.operationName) break;
+      await new Promise(r => setTimeout(r, 8000));
     }
 
     if (!startResp?.operationName) {
@@ -226,23 +209,17 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
     const opName = startResp.operationName;
 
-    // 2. Preguntar si ya terminó. PACIENTES: un fallo de red suelto NO nos rinde.
     let videoUri = null;
     let fatalError = null;
-    for (let i = 0; i < 60; i++) { // hasta ~10 minutos
+    for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 10000));
       const statusResp = await callAPI("/api/dreams/status", "POST", {
         operationName: opName,
       });
-
-      // ¿Ya está listo el video?
       if (statusResp?.done && statusResp?.videoUri) {
         videoUri = statusResp.videoUri;
         break;
       }
-
-      // Un "Failed to fetch" es un tropiezo de red pasajero: lo ignoramos y reintentamos.
-      // Un error REAL del backend (ej: operación no encontrada) sí lo tomamos en serio.
       if (statusResp?.error && statusResp.error !== "Failed to fetch") {
         fatalError = statusResp.error;
         if (/no encontrada|not found|404/i.test(statusResp.error)) break;
@@ -259,13 +236,12 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
       return;
     }
 
-    // 3. Crear el sueño con el video real
     const newDream = {
       id: Date.now(),
       text: dreamText,
       style: selectedStyle,
-      duration: selectedDuration,
-      isPublic: isPublic,
+      duration: 8,
+      isPublic,
       createdAt: new Date().toLocaleDateString('es-ES'),
       likes: 0,
       likedBy: [],
@@ -276,15 +252,14 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
     const updatedUser = { ...user };
     if (user.plan === "free") {
-      const duration = DURATIONS.find(d => d.sec === selectedDuration);
-      updatedUser.credits -= duration?.credits || 0;
+      updatedUser.credits -= 1;
     }
 
     setResultData({ dream: newDream, user: updatedUser });
     setGenerating(false);
     setShowResult(true);
     onDreamCreated(newDream, updatedUser);
-  }, [dreamText, selectedDuration, isPublic, selectedStyle, user, canGenerate, onDreamCreated]);
+  }, [dreamText, isPublic, selectedStyle, user, canGenerate, onDreamCreated]);
 
   if (generating) return <GeneratingScreen style={selectedStyle} />;
   if (showResult && resultData) {
@@ -292,11 +267,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
       <ResultScreen
         dream={resultData.dream}
         user={resultData.user}
-        onBack={() => {
-          setShowResult(false);
-          setDreamText("");
-          setError("");
-        }}
+        onBack={() => { setShowResult(false); setDreamText(""); setError(""); }}
       />
     );
   }
@@ -313,14 +284,11 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           <em style={{
             fontStyle: "italic",
             background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text"
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
           }}>{user.name.split(" ")[0]}</em>.
         </div>
       </div>
 
-      {/* Subscription activated message */}
       {subscriptionMessage && (
         <div style={{
           margin: "0 16px 12px", padding: "12px 14px", borderRadius: 12,
@@ -355,7 +323,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
       {/* Dream input */}
       <div style={{
-        margin: "0 16px 16px", padding: "16px",
+        margin: "0 16px 8px", padding: "16px",
         background: "rgba(255,255,255,0.03)", backdropFilter: "blur(20px)",
         borderRadius: 20, border: "0.5px solid rgba(255,255,255,0.08)",
         transition: "all 0.3s"
@@ -389,10 +357,28 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         </div>
       </div>
 
+      {/* Prompt suggestions */}
+      <div style={{ padding: "0 16px", marginBottom: 16, display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {SUGGESTIONS.map(s => (
+          <div
+            key={s}
+            onClick={() => { setDreamText(s); setError(""); }}
+            style={{
+              padding: "6px 12px", borderRadius: 20, cursor: "pointer",
+              background: "rgba(179,136,255,0.08)", border: "0.5px solid rgba(179,136,255,0.2)",
+              fontSize: 11, color: "rgba(184,168,216,0.8)", transition: "all 0.2s",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {s}
+          </div>
+        ))}
+      </div>
+
       {error && (
         <div style={{
           margin: "0 16px 12px", padding: "12px 14px", borderRadius: 12,
-          background: "rgba(255, 99, 71, 0.15)", border: "0.5px solid rgba(255, 99, 71, 0.3)",
+          background: "rgba(255,99,71,0.15)", border: "0.5px solid rgba(255,99,71,0.3)",
           fontSize: 12, color: "#ff6347"
         }}>
           {error}
@@ -400,7 +386,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
       )}
 
       {/* Universes */}
-      <div style={{ margin: "16px 0 16px" }}>
+      <div style={{ margin: "0 0 16px" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.22em", color: "rgba(184,168,216,0.55)", textTransform: "uppercase", padding: "0 24px", marginBottom: 12 }}>
           ELIGE TU UNIVERSO
         </div>
@@ -412,46 +398,34 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
               style={{
                 flexShrink: 0, width: 76, aspectRatio: "3/4", borderRadius: 14,
                 position: "relative", overflow: "hidden", cursor: "pointer",
-                border: selectedStyle === s.id ? "1.5px solid rgba(245,240,255,0.8)" : "0.5px solid rgba(255,255,255,0.08)",
-                boxShadow: selectedStyle === s.id ? "0 0 12px rgba(179,136,255,0.4)" : "none",
-                transition: "all 0.3s"
+                border: selectedStyle === s.id ? "1.5px solid rgba(245,240,255,0.9)" : "0.5px solid rgba(255,255,255,0.08)",
+                boxShadow: selectedStyle === s.id ? `0 0 18px ${s.colors[0]}66, 0 0 4px rgba(245,240,255,0.25)` : "none",
+                transform: selectedStyle === s.id ? "scale(1.06)" : "scale(1)",
+                transition: "all 0.25s"
               }}
             >
               <div style={{
-                position: "absolute", inset: 0, opacity: 0.85, mixBlendMode: "screen",
+                position: "absolute", inset: 0,
+                opacity: selectedStyle === s.id ? 1 : 0.65,
+                mixBlendMode: "screen",
                 background: `radial-gradient(circle at 30% 30%, ${s.colors[0]}, transparent 60%), radial-gradient(circle at 70% 70%, ${s.colors[1]}, transparent 60%)`
               }} />
+              {selectedStyle === s.id && (
+                <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.06)", borderRadius: 13 }} />
+              )}
               <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
                 <div style={{ fontSize: 22 }}>{s.icon}</div>
-                <div style={{ fontSize: 9, fontWeight: 500, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.6)", textAlign: "center" }}>
+                <div style={{ fontSize: 9, fontWeight: selectedStyle === s.id ? 700 : 500, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.6)", textAlign: "center" }}>
                   {s.name}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Duration */}
-      <div style={{ padding: "0 24px", margin: "16px 0 16px" }}>
-        <div style={{ display: "flex", gap: 6 }}>
-          {DURATIONS.map(d => (
-            <div
-              key={d.sec}
-              onClick={() => setSelectedDuration(d.sec)}
-              style={{
-                flex: 1, padding: "12px 0", borderRadius: 12, textAlign: "center", cursor: "pointer",
-                background: selectedDuration === d.sec ? "rgba(245,240,255,0.1)" : "rgba(255,255,255,0.02)",
-                border: selectedDuration === d.sec ? "0.5px solid rgba(245,240,255,0.3)" : "0.5px solid rgba(255,255,255,0.06)",
-                transition: "all 0.3s"
-              }}
-            >
-              <div style={{ fontFamily: "Georgia, serif", fontSize: 16, color: selectedDuration === d.sec ? "#f5f0ff" : "rgba(245,240,255,0.8)" }}>
-                {d.sec}s
-              </div>
-              <div style={{ fontSize: 10, color: selectedDuration === d.sec ? "rgba(179,136,255,0.9)" : "rgba(184,168,216,0.5)", marginTop: 2 }}>
-                ${d.price}
-              </div>
+              {selectedStyle === s.id && (
+                <div style={{
+                  position: "absolute", bottom: 5, left: "50%", transform: "translateX(-50%)",
+                  width: 4, height: 4, borderRadius: "50%",
+                  background: "white", boxShadow: "0 0 6px white"
+                }} />
+              )}
             </div>
           ))}
         </div>
@@ -471,8 +445,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           <div style={{
             width: 32, height: 32, borderRadius: 10,
             background: isPublic ? "rgba(179,136,255,0.15)" : "rgba(128,176,255,0.12)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 16
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16
           }}>{isPublic ? "🌍" : "🔒"}</div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 500, color: "#f5f0ff" }}>
@@ -495,14 +468,12 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         </div>
       </div>
 
-      {/* Subscribe button or Generate button */}
       {showSubscribeButton ? (
         <div onClick={onSubscribe} style={{
           margin: "0 16px 18px", padding: 16, borderRadius: 18, cursor: "pointer",
           background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-          boxShadow: "0 12px 36px rgba(153,102,255,0.4)",
-          transition: "all 0.4s"
+          boxShadow: "0 12px 36px rgba(153,102,255,0.4)", transition: "all 0.4s"
         }}>
           <span style={{ fontSize: 16 }}>✦</span>
           <span style={{ color: "white", fontSize: 15, fontWeight: 500 }}>Suscribirse — $12.99/mes</span>
@@ -527,32 +498,63 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 // ============ GENERATING SCREEN ============
 function GeneratingScreen({ style }) {
   const [progress, setProgress] = useState(0);
-  const [message, setMessage] = useState("Leyendo tu sueño...");
+  const [messageIdx, setMessageIdx] = useState(0);
   const s = getStyleById(style);
 
+  const starPositions = useMemo(() =>
+    Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      top: `${5 + (i * 37 + 13) % 85}%`,
+      left: `${5 + (i * 53 + 7) % 88}%`,
+      size: 1.5 + (i % 3) * 0.9,
+      delay: (i * 0.35) % 3,
+      duration: 2 + (i % 4) * 0.65,
+    })), []
+  );
+
   useEffect(() => {
-    const messages = ["Leyendo tu sueño...", "Eligiendo el universo...", "Generando la película...", "Casi listo..."];
-    const interval = setInterval(() => {
-      setProgress(p => {
-        const next = Math.min(p + 2.5, 100);
-        const idx = Math.floor((next / 100) * messages.length);
-        setMessage(messages[Math.min(idx, messages.length - 1)]);
-        return next;
-      });
-    }, 80);
-    return () => clearInterval(interval);
+    // reaches 90% in ~120 seconds: 0.375% per 500ms tick
+    const progressInterval = setInterval(() => {
+      setProgress(p => Math.min(p + 0.375, 90));
+    }, 500);
+
+    const messageInterval = setInterval(() => {
+      setMessageIdx(i => (i + 1) % GENERATING_MESSAGES.length);
+    }, 20000);
+
+    return () => {
+      clearInterval(progressInterval);
+      clearInterval(messageInterval);
+    };
   }, []);
 
   return (
     <div style={{
       minHeight: "100vh", display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center", padding: "60px 32px", textAlign: "center"
+      alignItems: "center", justifyContent: "center", padding: "60px 32px",
+      textAlign: "center", position: "relative", overflow: "hidden"
     }}>
+      {starPositions.map(star => (
+        <div key={star.id} style={{
+          position: "absolute",
+          top: star.top,
+          left: star.left,
+          width: star.size,
+          height: star.size,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.9)",
+          boxShadow: `0 0 ${star.size * 3}px rgba(179,136,255,0.9)`,
+          animation: `starFloat ${star.duration}s ease-in-out ${star.delay}s infinite alternate`,
+          pointerEvents: "none"
+        }} />
+      ))}
+
       <div style={{
-        width: 160, height: 160, borderRadius: "50%", marginBottom: 48, position: "relative",
+        width: 160, height: 160, borderRadius: "50%", marginBottom: 40, position: "relative",
         background: `radial-gradient(circle, ${s.colors[0]}88, ${s.colors[1]}44, transparent)`,
         boxShadow: `0 0 80px ${s.colors[0]}44, 0 0 120px ${s.colors[1]}22`,
-        animation: "orbPulse 3s ease-in-out infinite"
+        animation: "orbPulse 3s ease-in-out infinite",
+        display: "flex", alignItems: "center", justifyContent: "center"
       }}>
         <div style={{
           position: "absolute", inset: 12, borderRadius: "50%",
@@ -564,15 +566,29 @@ function GeneratingScreen({ style }) {
           border: "0.5px solid rgba(255,255,255,0.08)",
           animation: "orbRotate 12s linear infinite reverse"
         }} />
+        <span style={{ fontSize: 40, position: "relative", zIndex: 2 }}>{s.icon}</span>
       </div>
 
-      <div style={{ fontFamily: "Georgia, serif", fontSize: 24, fontStyle: "italic", color: "#f5f0ff", marginBottom: 12, lineHeight: 1.3 }}>
-        {message}
+      <div style={{
+        fontFamily: "Georgia, serif", fontSize: 18, color: "rgba(245,240,255,0.5)",
+        marginBottom: 14, letterSpacing: "0.06em"
+      }}>
+        Generando tu sueño...
       </div>
 
-      <div style={{ width: "100%", maxWidth: 240, height: 2.5, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 16 }}>
+      <div style={{
+        fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic",
+        color: "#f5f0ff", marginBottom: 36, lineHeight: 1.5,
+        minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "0 16px",
+        key: messageIdx
+      }}>
+        {GENERATING_MESSAGES[messageIdx]}
+      </div>
+
+      <div style={{ width: "100%", maxWidth: 280, height: 3, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 10 }}>
         <div style={{
-          height: "100%", borderRadius: 2, transition: "width 0.3s",
+          height: "100%", borderRadius: 2, transition: "width 0.5s ease",
           width: `${progress}%`,
           background: `linear-gradient(90deg, ${s.colors[0]}, ${s.colors[1]})`
         }} />
@@ -580,8 +596,9 @@ function GeneratingScreen({ style }) {
       <div style={{ fontSize: 12, color: "rgba(184,168,216,0.4)" }}>{Math.round(progress)}%</div>
 
       <style>{`
-        @keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
         @keyframes orbRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes starFloat { from { transform: translateY(0) scale(1); opacity: 0.4; } to { transform: translateY(-14px) scale(1.5); opacity: 1; } }
       `}</style>
     </div>
   );
@@ -592,6 +609,7 @@ function ResultScreen({ dream, user, onBack }) {
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");
   const [dreamComments, setDreamComments] = useState(dream.comments || []);
+  const [copied, setCopied] = useState(false);
   const s = getStyleById(dream.style);
 
   const handleAddComment = () => {
@@ -601,8 +619,28 @@ function ResultScreen({ dream, user, onBack }) {
     }
   };
 
-  const shareToSocial = (platform) => {
-    alert(`Compartido a ${platform}! (Funcionalidad simulada)`);
+  const handleDownload = () => {
+    const a = document.createElement("a");
+    a.href = dream.videoUrl;
+    a.download = `dream-${dream.id}.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleWhatsApp = () => {
+    const text = encodeURIComponent(`¡Mira el sueño que generé con IA! ${dream.videoUrl}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(dream.videoUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      setCopied(false);
+    }
   };
 
   return (
@@ -612,7 +650,6 @@ function ResultScreen({ dream, user, onBack }) {
         <span style={{ fontSize: 13, color: "rgba(184,168,216,0.7)" }}>Volver</span>
       </div>
 
-      {/* Video con controles normales del navegador (play, volumen, barra de tiempo) */}
       <div style={{ margin: "0 16px 20px", borderRadius: 24, overflow: "hidden", position: "relative", aspectRatio: "9/16", background: "#000" }}>
         <video
           src={dream.videoUrl}
@@ -626,15 +663,37 @@ function ResultScreen({ dream, user, onBack }) {
           padding: "4px 10px", borderRadius: 10,
           background: "rgba(0,0,0,0.45)", backdropFilter: "blur(10px)",
           fontSize: 11, color: "rgba(255,255,255,0.85)", pointerEvents: "none"
-        }}>{dream.duration}s · {s.name}</div>
+        }}>8s · {s.name}</div>
       </div>
 
-      {/* Dream text */}
       <div style={{ padding: "0 24px", marginBottom: 20 }}>
         <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontStyle: "italic", color: "#f5f0ff", lineHeight: 1.4, marginBottom: 10 }}>
           "{dream.text}"
         </div>
-        <div style={{ fontSize: 11, color: "rgba(184,168,216,0.5)" }}>{dream.createdAt} · {s.name} · {dream.duration}s</div>
+        <div style={{ fontSize: 11, color: "rgba(184,168,216,0.5)" }}>{dream.createdAt} · {s.name} · 8s</div>
+      </div>
+
+      {/* Download / WhatsApp / Copy */}
+      <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 12 }}>
+        <button onClick={handleDownload} style={{
+          flex: 1, padding: "12px 4px", borderRadius: 12,
+          border: "0.5px solid rgba(255,255,255,0.1)",
+          background: "rgba(255,255,255,0.04)", color: "rgba(245,240,255,0.9)",
+          fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        }}>⬇ Descargar</button>
+        <button onClick={handleWhatsApp} style={{
+          flex: 1, padding: "12px 4px", borderRadius: 12,
+          border: "0.5px solid rgba(37,211,102,0.3)",
+          background: "rgba(37,211,102,0.08)", color: "rgba(37,211,102,0.9)",
+          fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        }}>💚 WhatsApp</button>
+        <button onClick={handleCopyLink} style={{
+          flex: 1, padding: "12px 4px", borderRadius: 12,
+          border: copied ? "0.5px solid rgba(100,220,150,0.4)" : "0.5px solid rgba(179,136,255,0.25)",
+          background: copied ? "rgba(100,220,150,0.1)" : "rgba(179,136,255,0.08)",
+          color: copied ? "rgba(100,220,150,0.9)" : "rgba(179,136,255,0.9)",
+          fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        }}>{copied ? "✓ Copiado" : "🔗 Copiar"}</button>
       </div>
 
       {/* Interpretation */}
@@ -648,26 +707,15 @@ function ResultScreen({ dream, user, onBack }) {
         </div>
       </div>
 
-      {/* Actions */}
-      <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 16 }}>
+      {/* Comments */}
+      <div style={{ display: "flex", padding: "0 16px", marginBottom: 16 }}>
         <button onClick={() => setShowComments(!showComments)} style={{
           flex: 1, padding: 12, borderRadius: 12, border: "0.5px solid rgba(255,255,255,0.08)",
           background: "rgba(255,255,255,0.03)", color: "rgba(245,240,255,0.8)",
-          fontSize: 13, cursor: "pointer", transition: "all 0.3s"
-        }}>💬 {dreamComments.length}</button>
-        <button onClick={() => shareToSocial("Instagram")} style={{
-          flex: 1, padding: 12, borderRadius: 12, border: "0.5px solid rgba(255,255,255,0.08)",
-          background: "rgba(255,255,255,0.03)", color: "rgba(245,240,255,0.8)",
-          fontSize: 13, cursor: "pointer", transition: "all 0.3s"
-        }}>📤 Compartir</button>
-        <button onClick={() => alert("Guardado!")} style={{
-          flex: 1, padding: 12, borderRadius: 12, border: "0.5px solid rgba(255,255,255,0.08)",
-          background: "rgba(255,255,255,0.03)", color: "rgba(245,240,255,0.8)",
-          fontSize: 13, cursor: "pointer", transition: "all 0.3s"
-        }}>💾 Guardar</button>
+          fontSize: 13, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        }}>💬 {dreamComments.length} comentarios</button>
       </div>
 
-      {/* Comments section */}
       {showComments && (
         <div style={{ padding: "0 16px", marginBottom: 16 }}>
           <div style={{ marginBottom: 16 }}>
@@ -693,13 +741,13 @@ function ResultScreen({ dream, user, onBack }) {
               style={{
                 flex: 1, padding: "10px 12px", borderRadius: 10, border: "0.5px solid rgba(255,255,255,0.08)",
                 background: "rgba(255,255,255,0.03)", color: "rgba(245,240,255,0.8)",
-                fontSize: 12, outline: "none"
+                fontSize: 12, outline: "none", fontFamily: "inherit"
               }}
             />
             <button onClick={handleAddComment} style={{
               padding: "10px 14px", borderRadius: 10, background: "rgba(179,136,255,0.2)",
               border: "0.5px solid rgba(179,136,255,0.3)", color: "rgba(179,136,255,0.9)",
-              cursor: "pointer", fontSize: 12, fontWeight: 500
+              cursor: "pointer", fontSize: 12, fontWeight: 500, fontFamily: "inherit"
             }}>Enviar</button>
           </div>
         </div>
@@ -721,7 +769,7 @@ function DiarioScreen({ dreams }) {
   const stats = useMemo(() => ({
     total: dreams.length,
     public: dreams.filter(d => d.isPublic).length,
-    hours: (dreams.reduce((sum, d) => sum + d.duration, 0) / 60).toFixed(1)
+    hours: (dreams.reduce((sum, d) => sum + (d.duration || 8), 0) / 60).toFixed(1)
   }), [dreams]);
 
   return (
@@ -735,13 +783,12 @@ function DiarioScreen({ dreams }) {
         </div>
       </div>
 
-      {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, padding: "0 16px", marginBottom: 20 }}>
         {[
           { num: stats.total, label: "Sueños" },
           { num: stats.public, label: "Públicos" },
           { num: `${stats.hours}h`, label: "Video" },
-        ].map((s, i) => (
+        ].map((item, i) => (
           <div key={i} style={{
             padding: "14px 0", borderRadius: 14, textAlign: "center",
             background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.06)"
@@ -749,30 +796,26 @@ function DiarioScreen({ dreams }) {
             <div style={{
               fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 300,
               background: "linear-gradient(135deg, #ff7eb6, #b388ff)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text"
-            }}>{s.num}</div>
-            <div style={{ fontSize: 10, color: "rgba(184,168,216,0.5)", marginTop: 4 }}>{s.label}</div>
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
+            }}>{item.num}</div>
+            <div style={{ fontSize: 10, color: "rgba(184,168,216,0.5)", marginTop: 4 }}>{item.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Filter */}
       <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 16 }}>
         {["all", "public", "private"].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
             flex: 1, padding: "10px", borderRadius: 10, border: "0.5px solid rgba(255,255,255,0.08)",
             background: filter === f ? "rgba(245,240,255,0.1)" : "rgba(255,255,255,0.03)",
             color: filter === f ? "#f5f0ff" : "rgba(245,240,255,0.7)",
-            fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontWeight: 500
+            fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontWeight: 500, fontFamily: "inherit"
           }}>
             {f === "all" ? "Todos" : f === "public" ? "Públicos" : "Privados"}
           </button>
         ))}
       </div>
 
-      {/* Dreams list */}
       <div style={{ padding: "0 16px" }}>
         {filteredDreams.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 20px", color: "rgba(184,168,216,0.5)", fontSize: 14 }}>
@@ -800,7 +843,7 @@ function DiarioScreen({ dreams }) {
                     <span>·</span>
                     <span>{s.name}</span>
                     <span>·</span>
-                    <span>{d.duration}s</span>
+                    <span>8s</span>
                     <span style={{ marginLeft: "auto" }}>{d.isPublic ? "🌍" : "🔒"}</span>
                   </div>
                 </div>
@@ -861,7 +904,7 @@ function UniversoScreen({ dreams, currentUserId }) {
                 <button style={{
                   fontSize: 11, padding: "4px 8px", borderRadius: 6,
                   background: "rgba(179,136,255,0.1)", border: "0.5px solid rgba(179,136,255,0.2)",
-                  color: "rgba(179,136,255,0.8)", cursor: "pointer"
+                  color: "rgba(179,136,255,0.8)", cursor: "pointer", fontFamily: "inherit"
                 }}>+ Seguir</button>
               </div>
 
@@ -902,8 +945,20 @@ function UniversoScreen({ dreams, currentUserId }) {
 
 // ============ PROFILE SCREEN ============
 function ProfileScreen({ user, onUpgrade }) {
-  const [showSettings, setShowSettings] = useState(false);
   const { signOut } = useClerk();
+  const [referralCopied, setReferralCopied] = useState(false);
+
+  const referralCode = user.id ? user.id.slice(0, 8).toUpperCase() : "--------";
+
+  const handleCopyReferral = async () => {
+    try {
+      await navigator.clipboard.writeText(referralCode);
+      setReferralCopied(true);
+      setTimeout(() => setReferralCopied(false), 2500);
+    } catch {
+      setReferralCopied(false);
+    }
+  };
 
   return (
     <div style={{ padding: "20px 0" }}>
@@ -938,7 +993,7 @@ function ProfileScreen({ user, onUpgrade }) {
 
       {/* Plan card */}
       <div style={{
-        margin: "0 16px 20px", padding: 24, borderRadius: 20,
+        margin: "0 16px 16px", padding: 24, borderRadius: 20,
         background: "linear-gradient(135deg, rgba(107,31,184,0.12), rgba(200,48,126,0.08), rgba(64,128,255,0.12))",
         border: "0.5px solid rgba(255,255,255,0.1)"
       }}>
@@ -950,8 +1005,8 @@ function ProfileScreen({ user, onUpgrade }) {
           {user.plan === "free"
             ? "1 video de prueba de 8s · Sin face swap"
             : user.plan === "soñador"
-            ? "3 videos de hasta 24s al mes · Todos los estilos"
-            : "12 videos de hasta 16s · Face swap · 4K"
+            ? "3 videos de 8s al mes · Todos los estilos"
+            : "12 videos de 8s · Face swap · 4K"
           }
         </div>
         {user.plan === "free" && (
@@ -959,11 +1014,46 @@ function ProfileScreen({ user, onUpgrade }) {
             width: "100%", padding: 14, borderRadius: 14, cursor: "pointer",
             background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
             color: "white", fontSize: 14, fontWeight: 500, border: "none",
-            boxShadow: "0 8px 24px rgba(153,102,255,0.3)", transition: "all 0.3s"
+            boxShadow: "0 8px 24px rgba(153,102,255,0.3)", transition: "all 0.3s",
+            fontFamily: "inherit"
           }}>
             ✦ Suscribirse — $12.99/mes
           </button>
         )}
+      </div>
+
+      {/* Referral card */}
+      <div style={{
+        margin: "0 16px 16px", padding: "20px", borderRadius: 20,
+        background: "rgba(179,136,255,0.06)", border: "0.5px solid rgba(179,136,255,0.2)"
+      }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "rgba(179,136,255,0.7)", marginBottom: 10, textTransform: "uppercase" }}>
+          🎁 PROGRAMA DE REFERIDOS
+        </div>
+        <div style={{ fontSize: 13, color: "rgba(245,240,255,0.8)", lineHeight: 1.5, marginBottom: 16 }}>
+          Comparte tu código y gana 1 sueño gratis por cada amigo que se suscriba
+        </div>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "12px 14px", borderRadius: 12,
+          background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(179,136,255,0.25)"
+        }}>
+          <div style={{
+            flex: 1, fontFamily: "Georgia, serif", fontSize: 20, letterSpacing: "0.12em",
+            color: "#f5f0ff", fontWeight: 300
+          }}>
+            {referralCode}
+          </div>
+          <button onClick={handleCopyReferral} style={{
+            padding: "8px 16px", borderRadius: 10, cursor: "pointer",
+            background: referralCopied ? "rgba(100,220,150,0.15)" : "rgba(179,136,255,0.15)",
+            border: referralCopied ? "0.5px solid rgba(100,220,150,0.4)" : "0.5px solid rgba(179,136,255,0.3)",
+            color: referralCopied ? "rgba(100,220,150,0.9)" : "rgba(179,136,255,0.9)",
+            fontSize: 12, fontWeight: 500, transition: "all 0.3s", fontFamily: "inherit"
+          }}>
+            {referralCopied ? "✓ Copiado" : "Copiar"}
+          </button>
+        </div>
       </div>
 
       {/* Settings menu */}
@@ -994,7 +1084,6 @@ function ProfileScreen({ user, onUpgrade }) {
         ))}
       </div>
 
-      {/* Cerrar sesión */}
       <div style={{ padding: "16px 16px 0" }}>
         <button
           onClick={() => signOut()}
@@ -1010,7 +1099,7 @@ function ProfileScreen({ user, onUpgrade }) {
       </div>
 
       <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: "rgba(184,168,216,0.25)" }}>
-        Dreams Come True · v1.2.0<br />Hecho con magia ✨ en México
+        Dreams Come True · v1.3.0<br />Hecho con magia ✨ en México
       </div>
     </div>
   );
@@ -1027,7 +1116,6 @@ function LoginScreen() {
       <Nebula />
       <Stars />
       <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: 380, textAlign: "center" }}>
-        {/* Logo / título */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>✦</div>
           <div style={{
@@ -1040,8 +1128,6 @@ function LoginScreen() {
             Materializa tus sueños con IA
           </div>
         </div>
-
-        {/* Componente de login de Clerk */}
         <div style={{ borderRadius: 20, overflow: "hidden" }}>
           <SignIn
             appearance={{
@@ -1079,16 +1165,13 @@ function LoginScreen() {
 
 // ============ MAIN APP ============
 export default function DreamsComeTrue() {
-  // ── Todos los hooks PRIMERO, sin excepción ──
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const [tab, setTab] = useState("sonar");
 
-  // Créditos y suscripción reales del backend
   const [credits, setCredits] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [subscriptionMessage, setSubscriptionMessage] = useState("");
 
-  // Construimos el objeto "user" de la app a partir del usuario real de Clerk
   const user = useMemo(() => ({
     id: clerkUser?.id || "",
     name: clerkUser?.fullName || clerkUser?.firstName || clerkUser?.emailAddresses?.[0]?.emailAddress || "Soñador",
@@ -1102,7 +1185,6 @@ export default function DreamsComeTrue() {
   const fullUser = useMemo(() => ({ ...user, ...userExtras }), [user, userExtras]);
   const [dreams, setDreams] = useLocalStorage(`dreams_${user.id}`, []);
 
-  // Carga créditos del backend cuando hay sesión activa
   useEffect(() => {
     if (!isSignedIn || !clerkUser?.id) return;
     callAPI(`/credits/${clerkUser.id}`).then(data => {
@@ -1113,7 +1195,6 @@ export default function DreamsComeTrue() {
     });
   }, [isSignedIn, clerkUser?.id]);
 
-  // Detecta ?subscribed=true en la URL tras volver de Stripe
   useEffect(() => {
     if (!clerkUser?.id) return;
     const params = new URLSearchParams(window.location.search);
@@ -1150,9 +1231,6 @@ export default function DreamsComeTrue() {
     handleSubscribe();
   }, [handleSubscribe]);
 
-  // ── Returns condicionales DESPUÉS de todos los hooks ──
-
-  // Mientras Clerk carga, mostramos spinner
   if (!isLoaded) {
     return (
       <div style={{ minHeight: "100vh", background: "#000", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -1162,7 +1240,6 @@ export default function DreamsComeTrue() {
     );
   }
 
-  // Si no hay sesión, mostramos el login
   if (!isSignedIn) {
     return <LoginScreen />;
   }
@@ -1211,7 +1288,6 @@ export default function DreamsComeTrue() {
         {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} />}
       </div>
 
-      {/* Bottom tab bar */}
       <div style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430,
