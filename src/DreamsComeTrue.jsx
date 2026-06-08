@@ -1141,6 +1141,8 @@ export default function DreamsComeTrue() {
     });
     if (data.url) {
       window.location.href = data.url;
+    } else if (data._status === 404 || data.error) {
+      alert("El servidor está despertando (puede tardar ~30 segundos). Inténtalo de nuevo.");
     }
   }, [clerkUser]);
 
