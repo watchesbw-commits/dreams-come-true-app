@@ -1044,6 +1044,7 @@ function LoginScreen() {
 
 // ============ MAIN APP ============
 export default function DreamsComeTrue() {
+  // ── Todos los hooks PRIMERO, sin excepción ──
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const [tab, setTab] = useState("sonar");
 
@@ -1059,8 +1060,19 @@ export default function DreamsComeTrue() {
 
   const [userExtras, setUserExtras] = useLocalStorage(`dreamUser_${user.id}`, { plan: "free", credits: 1 });
   const fullUser = useMemo(() => ({ ...user, ...userExtras }), [user, userExtras]);
-
   const [dreams, setDreams] = useLocalStorage(`dreams_${user.id}`, []);
+
+  const handleDreamCreated = useCallback((dream, updatedUser) => {
+    setDreams(prev => [dream, ...prev]);
+    setUserExtras({ plan: updatedUser.plan, credits: updatedUser.credits });
+  }, [setDreams, setUserExtras]);
+
+  const handleUpgrade = useCallback(() => {
+    alert("En la versión real conectaría con Stripe para pagos reales.");
+    setUserExtras({ plan: "soñador", credits: 3 });
+  }, [setUserExtras]);
+
+  // ── Returns condicionales DESPUÉS de todos los hooks ──
 
   // Mientras Clerk carga, mostramos spinner
   if (!isLoaded) {
@@ -1083,16 +1095,6 @@ export default function DreamsComeTrue() {
     { id: "universo", icon: "🪐", label: "Universo" },
     { id: "yo", icon: "👤", label: "Yo" },
   ];
-
-  const handleDreamCreated = useCallback((dream, updatedUser) => {
-    setDreams(prev => [dream, ...prev]);
-    setUserExtras({ plan: updatedUser.plan, credits: updatedUser.credits });
-  }, [setDreams, setUserExtras]);
-
-  const handleUpgrade = useCallback(() => {
-    alert("En la versión real conectaría con Stripe para pagos reales.");
-    setUserExtras({ plan: "soñador", credits: 3 });
-  }, [setUserExtras]);
 
   return (
     <div style={{
