@@ -946,17 +946,21 @@ function UniversoScreen({ dreams, currentUserId }) {
 // ============ PROFILE SCREEN ============
 function ProfileScreen({ user, onUpgrade }) {
   const { signOut } = useClerk();
-  const [referralCopied, setReferralCopied] = useState(false);
+  const [infoMessage, setInfoMessage] = useState("");
 
-  const referralCode = user.id ? user.id.slice(0, 8).toUpperCase() : "--------";
+  const menuItems = [
+    { icon: "📷", label: "Foto para face swap", desc: "Próximamente", badge: true },
+    { icon: "🔒", label: "Privacidad", desc: "Control total" },
+    { icon: "📞", label: "Soporte", desc: "Contáctanos" },
+  ];
 
-  const handleCopyReferral = async () => {
-    try {
-      await navigator.clipboard.writeText(referralCode);
-      setReferralCopied(true);
-      setTimeout(() => setReferralCopied(false), 2500);
-    } catch {
-      setReferralCopied(false);
+  const handleItemClick = (label) => {
+    if (label === "Foto para face swap") {
+      setInfoMessage("Esta función estará disponible pronto");
+    } else if (label === "Privacidad") {
+      setInfoMessage("Tus datos están protegidos. No compartimos tu información con terceros.");
+    } else if (label === "Soporte") {
+      window.location.href = "mailto:soporte@dreamscometrue.app";
     }
   };
 
@@ -1022,61 +1026,48 @@ function ProfileScreen({ user, onUpgrade }) {
         )}
       </div>
 
-      {/* Referral card */}
-      <div style={{
-        margin: "0 16px 16px", padding: "20px", borderRadius: 20,
-        background: "rgba(179,136,255,0.06)", border: "0.5px solid rgba(179,136,255,0.2)"
-      }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "rgba(179,136,255,0.7)", marginBottom: 10, textTransform: "uppercase" }}>
-          🎁 PROGRAMA DE REFERIDOS
+      {/* Info message */}
+      {infoMessage && (
+        <div
+          onClick={() => setInfoMessage("")}
+          style={{
+            margin: "0 16px 16px", padding: "14px 16px", borderRadius: 14, cursor: "pointer",
+            background: "rgba(179,136,255,0.1)", border: "0.5px solid rgba(179,136,255,0.25)",
+            fontSize: 13, color: "rgba(245,240,255,0.85)", lineHeight: 1.5
+          }}
+        >
+          {infoMessage}
         </div>
-        <div style={{ fontSize: 13, color: "rgba(245,240,255,0.8)", lineHeight: 1.5, marginBottom: 16 }}>
-          Comparte tu código y gana 1 sueño gratis por cada amigo que se suscriba
-        </div>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "12px 14px", borderRadius: 12,
-          background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(179,136,255,0.25)"
-        }}>
-          <div style={{
-            flex: 1, fontFamily: "Georgia, serif", fontSize: 20, letterSpacing: "0.12em",
-            color: "#f5f0ff", fontWeight: 300
-          }}>
-            {referralCode}
-          </div>
-          <button onClick={handleCopyReferral} style={{
-            padding: "8px 16px", borderRadius: 10, cursor: "pointer",
-            background: referralCopied ? "rgba(100,220,150,0.15)" : "rgba(179,136,255,0.15)",
-            border: referralCopied ? "0.5px solid rgba(100,220,150,0.4)" : "0.5px solid rgba(179,136,255,0.3)",
-            color: referralCopied ? "rgba(100,220,150,0.9)" : "rgba(179,136,255,0.9)",
-            fontSize: 12, fontWeight: 500, transition: "all 0.3s", fontFamily: "inherit"
-          }}>
-            {referralCopied ? "✓ Copiado" : "Copiar"}
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Settings menu */}
       <div style={{ padding: "0 16px" }}>
-        {[
-          { icon: "📷", label: "Foto para face swap", desc: "Cámara" },
-          { icon: "🌐", label: "Idioma", desc: "Español" },
-          { icon: "🔔", label: "Notificaciones", desc: "Habilitadas" },
-          { icon: "🔒", label: "Privacidad", desc: "Control total" },
-          { icon: "❓", label: "Ayuda", desc: "FAQ" },
-          { icon: "📞", label: "Soporte", desc: "Contáctanos" },
-        ].map((item, i) => (
-          <div key={i} style={{
-            display: "flex", alignItems: "center", gap: 12, padding: "14px 8px",
-            borderBottom: "0.5px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "all 0.3s"
-          }}>
+        {menuItems.map((item, i) => (
+          <div
+            key={i}
+            onClick={() => handleItemClick(item.label)}
+            style={{
+              display: "flex", alignItems: "center", gap: 12, padding: "14px 8px",
+              borderBottom: "0.5px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "all 0.3s"
+            }}
+          >
             <div style={{
               width: 40, height: 40, borderRadius: 12,
               background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(255,255,255,0.06)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18
             }}>{item.icon}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, color: "#f5f0ff", fontWeight: 500 }}>{item.label}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 14, color: "#f5f0ff", fontWeight: 500 }}>{item.label}</span>
+                {item.badge && (
+                  <span style={{
+                    fontSize: 9, padding: "2px 6px", borderRadius: 6,
+                    background: "rgba(179,136,255,0.15)", border: "0.5px solid rgba(179,136,255,0.3)",
+                    color: "rgba(179,136,255,0.9)", fontWeight: 600, letterSpacing: "0.05em",
+                    textTransform: "uppercase"
+                  }}>Próximamente</span>
+                )}
+              </div>
               <div style={{ fontSize: 11, color: "rgba(184,168,216,0.5)" }}>{item.desc}</div>
             </div>
             <span style={{ fontSize: 18, color: "rgba(184,168,216,0.3)" }}>›</span>
