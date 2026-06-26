@@ -1090,7 +1090,7 @@ function ProfileScreen({ user, onUpgrade }) {
       </div>
 
       <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: "rgba(184,168,216,0.25)" }}>
-        Dreams Come True · v1.3.0<br />Hecho con magia ✨ en México
+        Astra · v1.3.0<br />Hecho con magia ✨ en México
       </div>
     </div>
   );
@@ -1114,7 +1114,7 @@ function LoginScreen() {
             background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             marginBottom: 8
-          }}>Dreams Come True</div>
+          }}>Astra</div>
           <div style={{ fontSize: 14, color: "rgba(184,168,216,0.6)", fontStyle: "italic" }}>
             Materializa tus sueños con IA
           </div>
@@ -1155,7 +1155,7 @@ function LoginScreen() {
 }
 
 // ============ MAIN APP ============
-export default function DreamsComeTrue() {
+export default function Astra() {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const [tab, setTab] = useState("sonar");
 
