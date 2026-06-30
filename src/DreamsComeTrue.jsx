@@ -21,31 +21,7 @@ async function callAPI(endpoint, method = "GET", body = null) {
 }
 
 // ============ DATA & CONSTANTS ============
-const STYLES = [
-  { id: "real",       name: "Realista",   icon: "📷", colors: ["#cccccc", "#ffaa66"], prompt: "realistic, cinematic, photorealistic" },
-  { id: "anime",      name: "Anime",      icon: "⛩",  colors: ["#ff5577", "#6633cc"], prompt: "anime style, hand drawn animation" },
-  { id: "cyber",      name: "Cyberpunk",  icon: "⚡",  colors: ["#ff3399", "#3366ff"], prompt: "cyberpunk, neon lights, futuristic city" },
-  { id: "fantasy",    name: "Fantasy",    icon: "🌲", colors: ["#9966ff", "#66ccff"], prompt: "fantasy, magical, ethereal, enchanted" },
-  { id: "ghibli",     name: "Ghibli",     icon: "🍃", colors: ["#66cc99", "#ffcc66"], prompt: "Studio Ghibli style, whimsical, soft colors" },
-  { id: "acuarela",   name: "Acuarela",   icon: "🎨", colors: ["#ffaadd", "#aaddff"], prompt: "watercolor art style, soft brushstrokes" },
-  { id: "pixel",      name: "Pixel Art",  icon: "🕹", colors: ["#00ddaa", "#ffdd00"], prompt: "pixel art style, retro game aesthetic" },
-  { id: "terror",     name: "Terror",     icon: "👻", colors: ["#663366", "#1a0033"], prompt: "horror, dark, eerie, shadows" },
-  { id: "scifi",      name: "Sci-Fi",     icon: "🚀", colors: ["#003399", "#00ccff"], prompt: "science fiction, space, futuristic" },
-  { id: "naturaleza", name: "Naturaleza", icon: "🌿", colors: ["#1a4a1a", "#66cc44"], prompt: "nature, forest, peaceful, green" },
-];
-
-const INTERPRETATIONS = {
-  cyber:      "Tu mente busca libertad y rebeldía. El neón representa tus ambiciones brillantes en un mundo complejo.",
-  anime:      "Eres un guerrero espiritual. Refleja tu determinación para superar obstáculos.",
-  ghibli:     "Hay paz y magia en tu interior. Buscas conexión con la naturaleza.",
-  fantasy:    "Tu imaginación es tu mayor fortaleza. Potencial ilimitado esperando ser despertado.",
-  terror:     "Enfrentas miedos internos que necesitan ser reconocidos.",
-  real:       "Buscas claridad y verdad sin filtros.",
-  acuarela:   "Eres un artista. Tu creatividad fluye naturalmente.",
-  pixel:      "Hay nostalgia y autenticidad en tu corazón.",
-  scifi:      "Tu mente viaja hacia el futuro. La ciencia y el misterio del universo te fascinan.",
-  naturaleza: "Tu alma encuentra paz en lo natural. La tierra y el bosque son tu refugio.",
-};
+const GENERIC_INTERPRETATION = "Tu sueño refleja tu búsqueda de significado y transformación. Cada imagen que ves es un reflejo de tu subconsciente tomando forma.";
 
 const SUGGESTIONS = [
   "Volaba sobre el océano al amanecer",
@@ -95,66 +71,77 @@ const useLocalStorage = (key, initialValue) => {
   return [storedValue, setValue];
 };
 
-function getStyleById(id) {
-  return STYLES.find(s => s.id === id) || STYLES[0];
-}
-
-// ============ COMPONENTS ============
-const Nebula = () => (
-  <div style={{
-    position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none",
-    background: `
-      radial-gradient(circle at 20% 15%, rgba(107,31,184,0.35) 0%, transparent 45%),
-      radial-gradient(circle at 80% 70%, rgba(200,48,126,0.25) 0%, transparent 50%),
-      radial-gradient(circle at 50% 90%, rgba(45,90,204,0.3) 0%, transparent 55%)
-    `
-  }} />
-);
-
-const Stars = () => (
-  <div style={{
-    position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none",
-    backgroundImage: `
-      radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.6), transparent),
-      radial-gradient(1px 1px at 38% 45%, rgba(200,150,255,0.5), transparent),
-      radial-gradient(1px 1px at 65% 18%, rgba(255,255,255,0.7), transparent),
-      radial-gradient(1px 1px at 82% 55%, rgba(150,200,255,0.5), transparent),
-      radial-gradient(1px 1px at 25% 72%, rgba(255,255,255,0.4), transparent),
-      radial-gradient(1.5px 1.5px at 90% 30%, rgba(255,255,255,0.7), transparent),
-      radial-gradient(1px 1px at 55% 88%, rgba(255,180,220,0.5), transparent),
-      radial-gradient(1px 1px at 10% 90%, rgba(180,140,255,0.5), transparent)
-    `
-  }} />
-);
-
-function DreamCard({ colors, children, style: extraStyle = {} }) {
+// ============ GLOBAL STYLES (white glass 3D) ============
+function GlobalStyles() {
   return (
-    <div style={{
-      borderRadius: 16, overflow: "hidden", position: "relative",
-      border: "0.5px solid rgba(255,255,255,0.08)",
-      ...extraStyle
-    }}>
-      <div style={{
-        position: "absolute", inset: 0, opacity: 0.8, mixBlendMode: "screen",
-        background: `radial-gradient(circle at 30% 20%, ${colors[0]}, transparent 60%), radial-gradient(circle at 70% 80%, ${colors[1]}, transparent 60%)`
-      }} />
-      <div style={{ position: "relative", zIndex: 2 }}>{children}</div>
-    </div>
-  );
-}
+    <style>{`
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+      ::-webkit-scrollbar { display: none; }
 
-function Button({ children, onClick, variant = "primary", style: extraStyle = {} }) {
-  const baseStyle = {
-    padding: "14px 24px", borderRadius: 14, border: "none", cursor: "pointer",
-    fontSize: 14, fontWeight: 500, transition: "all 0.3s",
-    fontFamily: "inherit"
-  };
-  const variants = {
-    primary: { ...baseStyle, background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)", color: "white", boxShadow: "0 8px 24px rgba(153,102,255,0.3)" },
-    secondary: { ...baseStyle, background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.08)", color: "rgba(245,240,255,0.8)" },
-    ghost: { ...baseStyle, background: "transparent", color: "rgba(184,168,216,0.7)", padding: "8px 12px" }
-  };
-  return <button onClick={onClick} style={{ ...variants[variant], ...extraStyle }}>{children}</button>;
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+      @keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+      @keyframes orbRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @keyframes starFloat { from { transform: translateY(0) scale(1); opacity: 0.4; } to { transform: translateY(-14px) scale(1.5); opacity: 1; } }
+
+      .glass-card {
+        background: rgba(255,255,255,0.9);
+        border: 1.5px solid transparent;
+        border-radius: 16px;
+        background-clip: padding-box;
+        box-shadow:
+          0 0 0 1.5px rgba(0,100,255,0.4),
+          0 4px 24px rgba(0,100,255,0.08),
+          inset 0 1px 0 rgba(255,255,255,0.8);
+        transition: all 0.2s ease;
+      }
+      .glass-card:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 0 0 1.5px rgba(0,150,255,0.6),
+          0 8px 32px rgba(0,100,255,0.15),
+          inset 0 1px 0 rgba(255,255,255,0.9);
+      }
+
+      .glass-input {
+        background: rgba(255,255,255,0.95);
+        border: 1.5px solid rgba(0,100,255,0.25);
+        border-radius: 12px;
+        color: #001a4d;
+        transition: all 0.2s ease;
+      }
+      .glass-input::placeholder { color: rgba(0,80,200,0.3); }
+      .glass-input:focus {
+        outline: none;
+        border-color: rgba(0,100,255,0.6);
+        box-shadow: 0 0 0 3px rgba(0,100,255,0.1);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #0066ff, #0099ff);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,100,255,0.35);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,100,255,0.45); }
+
+      .navbar-glass {
+        background: rgba(255,255,255,0.95);
+        border-top: 1.5px solid rgba(0,100,255,0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      .credits-pill {
+        background: rgba(0,100,255,0.08);
+        border: 1.5px solid rgba(0,100,255,0.25);
+        border-radius: 20px;
+        color: #0066ff;
+      }
+    `}</style>
+  );
 }
 
 // ============ SOÑAR SCREEN ============
@@ -239,14 +226,10 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     setError("");
     setGenerating(true);
 
-    const styleData = getStyleById("cyber");
-    const fullPrompt = styleData?.prompt ? `${dreamText}, ${styleData.prompt}` : dreamText;
-
     let startResp = null;
     for (let attempt = 0; attempt < 4; attempt++) {
       startResp = await callAPI("/api/dreams/generate", "POST", {
-        text: fullPrompt,
-        style: "cyber",
+        text: dreamText,
         userId: user.id,
         ...(includeFace && faceElementId ? { incluirCara: true, elementId: faceElementId } : {}),
       });
@@ -297,7 +280,6 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     const newDream = {
       id: Date.now(),
       text: dreamText,
-      style: "cyber",
       duration: 8,
       isPublic,
       createdAt: new Date().toLocaleDateString('es-ES'),
@@ -319,7 +301,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     onDreamCreated(newDream, updatedUser);
   }, [dreamText, isPublic, user, canGenerate, onDreamCreated, includeFace, faceElementId]);
 
-  if (generating) return <GeneratingScreen style="cyber" />;
+  if (generating) return <GeneratingScreen />;
   if (showResult && resultData) {
     return (
       <ResultScreen
@@ -334,24 +316,25 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     <div style={{ padding: "0 0 20px" }}>
       {/* Header */}
       <div style={{ padding: "24px 24px 12px" }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.22em", color: "rgba(184,168,216,0.55)", textTransform: "uppercase", marginBottom: 4 }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.22em", color: "#0066ff", textTransform: "uppercase", marginBottom: 4, fontWeight: 600 }}>
           {new Date().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase()}
         </div>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#f5f0ff", lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 8 }}>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#001a4d", lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 8 }}>
           {greeting},<br />
           <em style={{
             fontStyle: "italic",
-            background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)",
+            background: "linear-gradient(135deg, #0066ff, #0099ff)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
           }}>{user.name.split(" ")[0]}</em>.
         </div>
       </div>
 
       {subscriptionMessage && (
-        <div style={{
-          margin: "0 16px 12px", padding: "12px 14px", borderRadius: 12,
-          background: "rgba(64,200,120,0.12)", border: "0.5px solid rgba(64,200,120,0.3)",
-          fontSize: 13, color: "rgba(100,220,150,0.9)", textAlign: "center", fontWeight: 500
+        <div className="glass-card" style={{
+          margin: "0 16px 12px", padding: "12px 14px",
+          background: "rgba(0,200,120,0.08)",
+          boxShadow: "0 0 0 1.5px rgba(0,200,120,0.4), 0 4px 24px rgba(0,200,120,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+          fontSize: 13, color: "#008844", textAlign: "center", fontWeight: 500
         }}>
           {subscriptionMessage}
         </div>
@@ -360,32 +343,119 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
       {/* Status bar */}
       <div style={{ padding: "0 24px", marginBottom: 16 }}>
         {hasActiveSubscription && hasCredits ? (
-          <div style={{
-            padding: "10px 12px", borderRadius: 12,
-            background: "linear-gradient(135deg, rgba(179,136,255,0.1), rgba(64,128,255,0.1))",
-            border: "0.5px solid rgba(179,136,255,0.2)",
-            fontSize: 12, color: "rgba(179,136,255,0.9)"
-          }}>
+          <div className="credits-pill" style={{ padding: "10px 12px", fontSize: 12, fontWeight: 500 }}>
             ✦ Tienes {credits} sueño{credits !== 1 ? "s" : ""} disponible{credits !== 1 ? "s" : ""} este mes
           </div>
         ) : (
           <div style={{
-            padding: "10px 12px", borderRadius: 12,
-            background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.08)",
-            fontSize: 12, color: "rgba(184,168,216,0.7)"
+            padding: "10px 12px", borderRadius: 20,
+            background: "rgba(0,68,170,0.06)", border: "1.5px solid rgba(0,100,255,0.15)",
+            fontSize: 12, color: "#334466"
           }}>
             {credits === null ? "Cargando..." : "Sin suscripción activa"}
           </div>
         )}
       </div>
 
+      {/* Dream input */}
+      <div className="glass-card" style={{ margin: "0 16px 8px", padding: "16px" }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
+          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#0066ff", boxShadow: "0 0 8px #0066ff", animation: "pulse 2s infinite" }} />
+          DESCRIBE TU SUEÑO
+        </div>
+        <textarea
+          className="glass-input"
+          value={dreamText}
+          onChange={(e) => { setDreamText(e.target.value); setError(""); }}
+          placeholder="Volaba sobre una ciudad de cristal bajo el océano..."
+          maxLength={500}
+          style={{
+            width: "100%", minHeight: 80, padding: 10,
+            fontFamily: "'Georgia', serif", fontSize: 16, fontStyle: "italic",
+            lineHeight: 1.5, resize: "none"
+          }}
+        />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: "50%",
+              background: "rgba(0,100,255,0.1)", border: "1.5px solid rgba(0,100,255,0.25)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#0066ff", fontSize: 16, cursor: "pointer", transition: "all 0.2s ease"
+            }}>🎤</div>
+            <span style={{ fontSize: 11, color: "#334466" }}>o di tu sueño</span>
+          </div>
+          <span style={{ fontSize: 10, color: "#0044aa" }}>{dreamText.length}/500</span>
+        </div>
+      </div>
+
+      {/* Prompt suggestions */}
+      <div style={{ padding: "0 16px", marginBottom: 16, display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {SUGGESTIONS.map(s => (
+          <div
+            key={s}
+            onClick={() => { setDreamText(s); setError(""); }}
+            style={{
+              padding: "6px 12px", borderRadius: 20, cursor: "pointer",
+              background: "rgba(0,100,255,0.06)", border: "1.5px solid rgba(0,100,255,0.2)",
+              fontSize: 11, color: "#0044aa", transition: "all 0.2s ease",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {s}
+          </div>
+        ))}
+      </div>
+
+      {error && (
+        <div style={{
+          margin: "0 16px 12px", padding: "12px 14px", borderRadius: 12,
+          background: "rgba(255,80,80,0.08)", border: "1.5px solid rgba(255,80,80,0.3)",
+          fontSize: 12, color: "#cc3333"
+        }}>
+          {error}
+        </div>
+      )}
+
+      {/* Privacy toggle */}
+      <div
+        className="glass-card"
+        onClick={() => setIsPublic(!isPublic)}
+        style={{
+          margin: "0 16px 16px", padding: "14px", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "space-between"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 10,
+            background: isPublic ? "rgba(0,100,255,0.12)" : "rgba(0,68,170,0.08)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16
+          }}>{isPublic ? "🌍" : "🔒"}</div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: "#001a4d" }}>
+              {isPublic ? "Compartir en Universo" : "Solo para ti"}
+            </div>
+            <div style={{ fontSize: 11, color: "#334466", marginTop: 2 }}>
+              {isPublic ? "Otros verán tu sueño" : "Solo tú verás esto"}
+            </div>
+          </div>
+        </div>
+        <div style={{
+          width: 38, height: 22, borderRadius: 11, position: "relative",
+          background: isPublic ? "linear-gradient(135deg, #0066ff, #0099ff)" : "rgba(0,68,170,0.12)",
+          border: "1.5px solid rgba(0,100,255,0.25)", transition: "background 0.2s ease"
+        }}>
+          <div style={{
+            width: 16, height: 16, borderRadius: "50%", background: "white",
+            position: "absolute", top: 2, left: isPublic ? 19 : 2, transition: "left 0.2s ease", boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
+          }} />
+        </div>
+      </div>
+
       {/* Foto del usuario */}
-      <div style={{
-        margin: "0 16px 16px", padding: "16px",
-        background: "rgba(255,255,255,0.03)", backdropFilter: "blur(20px)",
-        borderRadius: 20, border: "0.5px solid rgba(255,255,255,0.08)",
-      }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "rgba(184,168,216,0.5)", textTransform: "uppercase", marginBottom: 12 }}>
+      <div className="glass-card" style={{ margin: "0 16px 16px", padding: "16px" }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", textTransform: "uppercase", marginBottom: 12, fontWeight: 600 }}>
           ¿Quieres aparecer en tu sueño?
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -395,13 +465,13 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
               alt="Tu rostro"
               style={{
                 width: 56, height: 56, borderRadius: "50%", objectFit: "cover",
-                border: "1.5px solid rgba(179,136,255,0.4)", flexShrink: 0
+                border: "1.5px solid rgba(0,100,255,0.4)", flexShrink: 0
               }}
             />
           ) : (
             <div style={{
               width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
-              background: "rgba(179,136,255,0.1)", border: "0.5px solid rgba(179,136,255,0.25)",
+              background: "rgba(0,100,255,0.08)", border: "1.5px solid rgba(0,100,255,0.25)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22
             }}>📷</div>
           )}
@@ -412,27 +482,27 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
                 onClick={() => setIncludeFace(!includeFace)}
                 style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", marginBottom: 10 }}
               >
-                <span style={{ fontSize: 12, fontWeight: 500, color: "#f5f0ff" }}>Aparecer en mi sueño</span>
+                <span style={{ fontSize: 12, fontWeight: 500, color: "#001a4d" }}>Aparecer en mi sueño</span>
                 <div style={{
                   width: 38, height: 22, borderRadius: 11, position: "relative", flexShrink: 0,
-                  background: includeFace ? "rgba(179,136,255,0.4)" : "rgba(245,240,255,0.15)",
-                  border: "0.5px solid rgba(245,240,255,0.3)", transition: "background 0.3s"
+                  background: includeFace ? "linear-gradient(135deg, #0066ff, #0099ff)" : "rgba(0,68,170,0.12)",
+                  border: "1.5px solid rgba(0,100,255,0.25)", transition: "background 0.2s ease"
                 }}>
                   <div style={{
-                    width: 16, height: 16, borderRadius: "50%", background: "rgba(245,240,255,0.95)",
-                    position: "absolute", top: 3, left: includeFace ? 19 : 3, transition: "left 0.3s", boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
+                    width: 16, height: 16, borderRadius: "50%", background: "white",
+                    position: "absolute", top: 2, left: includeFace ? 19 : 2, transition: "left 0.2s ease", boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
                   }} />
                 </div>
               </div>
             )}
             <button
+              className="btn-primary"
               onClick={() => faceInputRef.current?.click()}
               disabled={uploadingFace}
               style={{
-                padding: "8px 14px", borderRadius: 10, border: "0.5px solid rgba(179,136,255,0.3)",
-                background: "rgba(179,136,255,0.1)", color: "rgba(179,136,255,0.9)",
-                fontSize: 12, fontWeight: 500, cursor: uploadingFace ? "default" : "pointer",
-                fontFamily: "inherit", opacity: uploadingFace ? 0.6 : 1
+                padding: "8px 14px", fontSize: 12, fontWeight: 500,
+                fontFamily: "inherit", opacity: uploadingFace ? 0.6 : 1,
+                cursor: uploadingFace ? "default" : "pointer"
               }}
             >
               {uploadingFace ? "Subiendo..." : faceImage ? "Cambiar foto" : "Subir foto"}
@@ -449,180 +519,31 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         />
 
         {faceError && (
-          <div style={{ marginTop: 10, fontSize: 11, color: "#ff6347" }}>{faceError}</div>
+          <div style={{ marginTop: 10, fontSize: 11, color: "#cc3333" }}>{faceError}</div>
         )}
       </div>
 
-      {/* Dream input */}
-      <div style={{
-        margin: "0 16px 8px", padding: "16px",
-        background: "rgba(255,255,255,0.03)", backdropFilter: "blur(20px)",
-        borderRadius: 20, border: "0.5px solid rgba(255,255,255,0.08)",
-        transition: "all 0.3s"
-      }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "rgba(184,168,216,0.5)", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#80b0ff", boxShadow: "0 0 8px #80b0ff", animation: "pulse 2s infinite" }} />
-          DESCRIBE TU SUEÑO
-        </div>
-        <textarea
-          value={dreamText}
-          onChange={(e) => { setDreamText(e.target.value); setError(""); }}
-          placeholder="Volaba sobre una ciudad de cristal bajo el océano..."
-          maxLength={500}
-          style={{
-            width: "100%", minHeight: 80, background: "transparent", border: "none",
-            fontFamily: "'Georgia', serif", fontSize: 16, fontStyle: "italic",
-            color: "rgba(245,240,255,0.85)", lineHeight: 1.5, resize: "none", outline: "none"
-          }}
-        />
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: "50%",
-              background: "rgba(179,136,255,0.15)", border: "0.5px solid rgba(179,136,255,0.3)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#b388ff", fontSize: 16, cursor: "pointer", transition: "all 0.3s"
-            }}>🎤</div>
-            <span style={{ fontSize: 11, color: "rgba(184,168,216,0.55)" }}>o di tu sueño</span>
-          </div>
-          <span style={{ fontSize: 10, color: "rgba(184,168,216,0.4)" }}>{dreamText.length}/500</span>
-        </div>
-      </div>
-
-      {/* Prompt suggestions */}
-      <div style={{ padding: "0 16px", marginBottom: 16, display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {SUGGESTIONS.map(s => (
-          <div
-            key={s}
-            onClick={() => { setDreamText(s); setError(""); }}
-            style={{
-              padding: "6px 12px", borderRadius: 20, cursor: "pointer",
-              background: "rgba(179,136,255,0.08)", border: "0.5px solid rgba(179,136,255,0.2)",
-              fontSize: 11, color: "rgba(184,168,216,0.8)", transition: "all 0.2s",
-              whiteSpace: "nowrap"
-            }}
-          >
-            {s}
-          </div>
-        ))}
-      </div>
-
-      {error && (
-        <div style={{
-          margin: "0 16px 12px", padding: "12px 14px", borderRadius: 12,
-          background: "rgba(255,99,71,0.15)", border: "0.5px solid rgba(255,99,71,0.3)",
-          fontSize: 12, color: "#ff6347"
-        }}>
-          {error}
-        </div>
-      )}
-
-      {/* Universes */}
-      <div style={{ margin: "0 0 16px" }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.22em", color: "rgba(184,168,216,0.55)", textTransform: "uppercase", padding: "0 24px", marginBottom: 12 }}>
-          ELIGE TU UNIVERSO
-        </div>
-        <div style={{ display: "flex", gap: 8, padding: "0 16px", overflowX: "auto", scrollbarWidth: "none" }}>
-          {STYLES.map(s => {
-            const isSelected = s.id === "cyber";
-            return (
-            <div
-              key={s.id}
-              style={{
-                flexShrink: 0, width: 76, aspectRatio: "3/4", borderRadius: 14,
-                position: "relative", overflow: "hidden",
-                border: isSelected ? "1.5px solid rgba(245,240,255,0.9)" : "0.5px solid rgba(255,255,255,0.08)",
-                boxShadow: isSelected ? `0 0 18px ${s.colors[0]}66, 0 0 4px rgba(245,240,255,0.25)` : "none",
-                transform: isSelected ? "scale(1.06)" : "scale(1)",
-                transition: "all 0.25s"
-              }}
-            >
-              <div style={{
-                position: "absolute", inset: 0,
-                opacity: isSelected ? 1 : 0.65,
-                mixBlendMode: "screen",
-                background: `radial-gradient(circle at 30% 30%, ${s.colors[0]}, transparent 60%), radial-gradient(circle at 70% 70%, ${s.colors[1]}, transparent 60%)`
-              }} />
-              {isSelected && (
-                <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.06)", borderRadius: 13 }} />
-              )}
-              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
-                <div style={{ fontSize: 22 }}>{s.icon}</div>
-                <div style={{ fontSize: 9, fontWeight: isSelected ? 700 : 500, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.6)", textAlign: "center" }}>
-                  {s.name}
-                </div>
-              </div>
-              {isSelected && (
-                <div style={{
-                  position: "absolute", bottom: 5, left: "50%", transform: "translateX(-50%)",
-                  width: 4, height: 4, borderRadius: "50%",
-                  background: "white", boxShadow: "0 0 6px white"
-                }} />
-              )}
-            </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Privacy toggle */}
-      <div
-        onClick={() => setIsPublic(!isPublic)}
-        style={{
-          margin: "0 16px 16px", padding: "14px", borderRadius: 14, cursor: "pointer",
-          background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.06)",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          transition: "all 0.3s"
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 10,
-            background: isPublic ? "rgba(179,136,255,0.15)" : "rgba(128,176,255,0.12)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16
-          }}>{isPublic ? "🌍" : "🔒"}</div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: "#f5f0ff" }}>
-              {isPublic ? "Compartir en Universo" : "Solo para ti"}
-            </div>
-            <div style={{ fontSize: 11, color: "rgba(184,168,216,0.5)", marginTop: 2 }}>
-              {isPublic ? "Otros verán tu sueño" : "Solo tú verás esto"}
-            </div>
-          </div>
-        </div>
-        <div style={{
-          width: 38, height: 22, borderRadius: 11, position: "relative",
-          background: isPublic ? "rgba(179,136,255,0.4)" : "rgba(245,240,255,0.15)",
-          border: "0.5px solid rgba(245,240,255,0.3)", transition: "background 0.3s"
-        }}>
-          <div style={{
-            width: 16, height: 16, borderRadius: "50%", background: "rgba(245,240,255,0.95)",
-            position: "absolute", top: 3, left: isPublic ? 19 : 3, transition: "left 0.3s", boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
-          }} />
-        </div>
-      </div>
-
       {showSubscribeButton ? (
-        <div onClick={onSubscribe} style={{
-          margin: "0 16px 18px", padding: 16, borderRadius: 18, cursor: "pointer",
-          background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-          boxShadow: "0 12px 36px rgba(153,102,255,0.4)", transition: "all 0.4s"
+        <div className="btn-primary" onClick={onSubscribe} style={{
+          margin: "0 16px 18px", padding: 16,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 10
         }}>
           <span style={{ fontSize: 16 }}>✦</span>
-          <span style={{ color: "white", fontSize: 15, fontWeight: 500 }}>Suscribirse — $12.99/mes</span>
+          <span style={{ fontSize: 15, fontWeight: 500 }}>Suscribirse — $12.99/mes</span>
         </div>
       ) : (
-        <div onClick={handleGenerate} style={{
-          margin: "0 16px 18px", padding: 16, borderRadius: 18, cursor: "pointer",
-          background: dreamText.trim() && canGenerate ? "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)" : "rgba(255,255,255,0.05)",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-          boxShadow: dreamText.trim() && canGenerate ? "0 12px 36px rgba(153,102,255,0.4)" : "none",
-          opacity: dreamText.trim() && canGenerate ? 1 : 0.5,
-          transition: "all 0.4s"
-        }}>
-          <span style={{ fontSize: 16 }}>✦</span>
-          <span style={{ color: "white", fontSize: 15, fontWeight: 500 }}>Materializar sueño</span>
+        <div
+          onClick={handleGenerate}
+          className={dreamText.trim() && canGenerate ? "btn-primary" : ""}
+          style={{
+            margin: "0 16px 18px", padding: 16, borderRadius: 12, cursor: "pointer",
+            background: dreamText.trim() && canGenerate ? undefined : "rgba(0,68,170,0.08)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+            opacity: dreamText.trim() && canGenerate ? 1 : 0.5
+          }}
+        >
+          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "white" : "#0066ff" }}>✦</span>
+          <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "white" : "#0066ff" }}>Materializar sueño</span>
         </div>
       )}
     </div>
@@ -630,10 +551,9 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 }
 
 // ============ GENERATING SCREEN ============
-function GeneratingScreen({ style }) {
+function GeneratingScreen() {
   const [progress, setProgress] = useState(0);
   const [messageIdx, setMessageIdx] = useState(0);
-  const s = getStyleById(style);
 
   const starPositions = useMemo(() =>
     Array.from({ length: 20 }, (_, i) => ({
@@ -676,8 +596,8 @@ function GeneratingScreen({ style }) {
           width: star.size,
           height: star.size,
           borderRadius: "50%",
-          background: "rgba(255,255,255,0.9)",
-          boxShadow: `0 0 ${star.size * 3}px rgba(179,136,255,0.9)`,
+          background: "#0066ff",
+          boxShadow: `0 0 ${star.size * 3}px rgba(0,100,255,0.6)`,
           animation: `starFloat ${star.duration}s ease-in-out ${star.delay}s infinite alternate`,
           pointerEvents: "none"
         }} />
@@ -685,26 +605,26 @@ function GeneratingScreen({ style }) {
 
       <div style={{
         width: 160, height: 160, borderRadius: "50%", marginBottom: 40, position: "relative",
-        background: `radial-gradient(circle, ${s.colors[0]}88, ${s.colors[1]}44, transparent)`,
-        boxShadow: `0 0 80px ${s.colors[0]}44, 0 0 120px ${s.colors[1]}22`,
+        background: "radial-gradient(circle, rgba(0,100,255,0.35), rgba(0,150,255,0.18), transparent)",
+        boxShadow: "0 0 80px rgba(0,100,255,0.25), 0 0 120px rgba(0,150,255,0.12)",
         animation: "orbPulse 3s ease-in-out infinite",
         display: "flex", alignItems: "center", justifyContent: "center"
       }}>
         <div style={{
           position: "absolute", inset: 12, borderRadius: "50%",
-          border: "0.5px solid rgba(255,255,255,0.15)",
+          border: "1.5px solid rgba(0,100,255,0.25)",
           animation: "orbRotate 8s linear infinite"
         }} />
         <div style={{
           position: "absolute", inset: 30, borderRadius: "50%",
-          border: "0.5px solid rgba(255,255,255,0.08)",
+          border: "1.5px solid rgba(0,100,255,0.15)",
           animation: "orbRotate 12s linear infinite reverse"
         }} />
-        <span style={{ fontSize: 40, position: "relative", zIndex: 2 }}>{s.icon}</span>
+        <span style={{ fontSize: 40, position: "relative", zIndex: 2 }}>✦</span>
       </div>
 
       <div style={{
-        fontFamily: "Georgia, serif", fontSize: 18, color: "rgba(245,240,255,0.5)",
+        fontFamily: "Georgia, serif", fontSize: 18, color: "#0044aa",
         marginBottom: 14, letterSpacing: "0.06em"
       }}>
         Generando tu sueño...
@@ -712,28 +632,21 @@ function GeneratingScreen({ style }) {
 
       <div style={{
         fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic",
-        color: "#f5f0ff", marginBottom: 36, lineHeight: 1.5,
+        color: "#001a4d", marginBottom: 36, lineHeight: 1.5,
         minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "0 16px",
-        key: messageIdx
+        padding: "0 16px"
       }}>
         {GENERATING_MESSAGES[messageIdx]}
       </div>
 
-      <div style={{ width: "100%", maxWidth: 280, height: 3, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 10 }}>
+      <div style={{ width: "100%", maxWidth: 280, height: 3, borderRadius: 2, background: "rgba(0,100,255,0.1)", overflow: "hidden", marginBottom: 10 }}>
         <div style={{
           height: "100%", borderRadius: 2, transition: "width 0.5s ease",
           width: `${progress}%`,
-          background: `linear-gradient(90deg, ${s.colors[0]}, ${s.colors[1]})`
+          background: "linear-gradient(90deg, #0066ff, #0099ff)"
         }} />
       </div>
-      <div style={{ fontSize: 12, color: "rgba(184,168,216,0.4)" }}>{Math.round(progress)}%</div>
-
-      <style>{`
-        @keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-        @keyframes orbRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes starFloat { from { transform: translateY(0) scale(1); opacity: 0.4; } to { transform: translateY(-14px) scale(1.5); opacity: 1; } }
-      `}</style>
+      <div style={{ fontSize: 12, color: "#334466" }}>{Math.round(progress)}%</div>
     </div>
   );
 }
@@ -744,7 +657,6 @@ function ResultScreen({ dream, user, onBack }) {
   const [comment, setComment] = useState("");
   const [dreamComments, setDreamComments] = useState(dream.comments || []);
   const [copied, setCopied] = useState(false);
-  const s = getStyleById(dream.style);
 
   const handleAddComment = () => {
     if (comment.trim()) {
@@ -780,11 +692,11 @@ function ResultScreen({ dream, user, onBack }) {
   return (
     <div style={{ padding: "0 0 20px" }}>
       <div onClick={onBack} style={{ padding: "16px 24px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-        <span style={{ fontSize: 18, color: "rgba(184,168,216,0.7)" }}>←</span>
-        <span style={{ fontSize: 13, color: "rgba(184,168,216,0.7)" }}>Volver</span>
+        <span style={{ fontSize: 18, color: "#0066ff" }}>←</span>
+        <span style={{ fontSize: 13, color: "#0066ff" }}>Volver</span>
       </div>
 
-      <div style={{ margin: "0 16px 20px", borderRadius: 24, overflow: "hidden", position: "relative", aspectRatio: "9/16", background: "#000" }}>
+      <div className="glass-card" style={{ margin: "0 16px 20px", overflow: "hidden", position: "relative", aspectRatio: "9/16", background: "#000" }}>
         <video
           src={dream.videoUrl}
           controls
@@ -797,56 +709,45 @@ function ResultScreen({ dream, user, onBack }) {
           padding: "4px 10px", borderRadius: 10,
           background: "rgba(0,0,0,0.45)", backdropFilter: "blur(10px)",
           fontSize: 11, color: "rgba(255,255,255,0.85)", pointerEvents: "none"
-        }}>8s · {s.name}</div>
+        }}>8s</div>
       </div>
 
       <div style={{ padding: "0 24px", marginBottom: 20 }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontStyle: "italic", color: "#f5f0ff", lineHeight: 1.4, marginBottom: 10 }}>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontStyle: "italic", color: "#001a4d", lineHeight: 1.4, marginBottom: 10 }}>
           "{dream.text}"
         </div>
-        <div style={{ fontSize: 11, color: "rgba(184,168,216,0.5)" }}>{dream.createdAt} · {s.name} · 8s</div>
+        <div style={{ fontSize: 11, color: "#334466" }}>{dream.createdAt} · 8s</div>
       </div>
 
       {/* Download / WhatsApp / Copy */}
       <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 12 }}>
-        <button onClick={handleDownload} style={{
-          flex: 1, padding: "12px 4px", borderRadius: 12,
-          border: "0.5px solid rgba(255,255,255,0.1)",
-          background: "rgba(255,255,255,0.04)", color: "rgba(245,240,255,0.9)",
-          fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        <button className="glass-card" onClick={handleDownload} style={{
+          flex: 1, padding: "12px 4px",
+          color: "#001a4d", fontSize: 12, cursor: "pointer", fontFamily: "inherit", border: "none"
         }}>⬇ Descargar</button>
-        <button onClick={handleWhatsApp} style={{
-          flex: 1, padding: "12px 4px", borderRadius: 12,
-          border: "0.5px solid rgba(37,211,102,0.3)",
-          background: "rgba(37,211,102,0.08)", color: "rgba(37,211,102,0.9)",
-          fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        <button className="glass-card" onClick={handleWhatsApp} style={{
+          flex: 1, padding: "12px 4px",
+          color: "#118844", fontSize: 12, cursor: "pointer", fontFamily: "inherit", border: "none"
         }}>💚 WhatsApp</button>
-        <button onClick={handleCopyLink} style={{
-          flex: 1, padding: "12px 4px", borderRadius: 12,
-          border: copied ? "0.5px solid rgba(100,220,150,0.4)" : "0.5px solid rgba(179,136,255,0.25)",
-          background: copied ? "rgba(100,220,150,0.1)" : "rgba(179,136,255,0.08)",
-          color: copied ? "rgba(100,220,150,0.9)" : "rgba(179,136,255,0.9)",
-          fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        <button className="glass-card" onClick={handleCopyLink} style={{
+          flex: 1, padding: "12px 4px",
+          color: copied ? "#118844" : "#0066ff", fontSize: 12, cursor: "pointer", fontFamily: "inherit", border: "none"
         }}>{copied ? "✓ Copiado" : "🔗 Copiar"}</button>
       </div>
 
       {/* Interpretation */}
-      <div style={{
-        margin: "0 16px 16px", padding: 18, borderRadius: 18,
-        background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.08)"
-      }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "rgba(184,168,216,0.5)", marginBottom: 10, textTransform: "uppercase" }}>INTERPRETACIÓN</div>
-        <div style={{ fontSize: 14, color: "rgba(245,240,255,0.8)", lineHeight: 1.6, fontWeight: 300 }}>
-          {INTERPRETATIONS[dream.style] || "Tu sueño refleja tu búsqueda de significado y transformación."}
+      <div className="glass-card" style={{ margin: "0 16px 16px", padding: 18 }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", marginBottom: 10, textTransform: "uppercase", fontWeight: 600 }}>INTERPRETACIÓN</div>
+        <div style={{ fontSize: 14, color: "#334466", lineHeight: 1.6, fontWeight: 300 }}>
+          {GENERIC_INTERPRETATION}
         </div>
       </div>
 
       {/* Comments */}
       <div style={{ display: "flex", padding: "0 16px", marginBottom: 16 }}>
-        <button onClick={() => setShowComments(!showComments)} style={{
-          flex: 1, padding: 12, borderRadius: 12, border: "0.5px solid rgba(255,255,255,0.08)",
-          background: "rgba(255,255,255,0.03)", color: "rgba(245,240,255,0.8)",
-          fontSize: 13, cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit"
+        <button className="glass-card" onClick={() => setShowComments(!showComments)} style={{
+          flex: 1, padding: 12, color: "#001a4d",
+          fontSize: 13, cursor: "pointer", fontFamily: "inherit", border: "none"
         }}>💬 {dreamComments.length} comentarios</button>
       </div>
 
@@ -854,33 +755,32 @@ function ResultScreen({ dream, user, onBack }) {
         <div style={{ padding: "0 16px", marginBottom: 16 }}>
           <div style={{ marginBottom: 16 }}>
             {dreamComments.length === 0 ? (
-              <div style={{ fontSize: 12, color: "rgba(184,168,216,0.5)", textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: 12, color: "#334466", textAlign: "center", padding: "20px 0" }}>
                 Sé el primero en comentar
               </div>
             ) : (
               dreamComments.map(c => (
-                <div key={c.id} style={{ marginBottom: 12, padding: "12px", borderRadius: 12, background: "rgba(255,255,255,0.02)" }}>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: "#f5f0ff" }}>{c.author}</div>
-                  <div style={{ fontSize: 12, color: "rgba(245,240,255,0.7)", marginTop: 4 }}>{c.text}</div>
+                <div key={c.id} className="glass-card" style={{ marginBottom: 12, padding: "12px" }}>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: "#001a4d" }}>{c.author}</div>
+                  <div style={{ fontSize: 12, color: "#334466", marginTop: 4 }}>{c.text}</div>
                 </div>
               ))
             )}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <input
+              className="glass-input"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
               placeholder="Comenta..."
               style={{
-                flex: 1, padding: "10px 12px", borderRadius: 10, border: "0.5px solid rgba(255,255,255,0.08)",
-                background: "rgba(255,255,255,0.03)", color: "rgba(245,240,255,0.8)",
-                fontSize: 12, outline: "none", fontFamily: "inherit"
+                flex: 1, padding: "10px 12px",
+                fontSize: 12, fontFamily: "inherit"
               }}
             />
-            <button onClick={handleAddComment} style={{
-              padding: "10px 14px", borderRadius: 10, background: "rgba(179,136,255,0.2)",
-              border: "0.5px solid rgba(179,136,255,0.3)", color: "rgba(179,136,255,0.9)",
+            <button className="btn-primary" onClick={handleAddComment} style={{
+              padding: "10px 14px",
               cursor: "pointer", fontSize: 12, fontWeight: 500, fontFamily: "inherit"
             }}>Enviar</button>
           </div>
@@ -909,10 +809,10 @@ function DiarioScreen({ dreams }) {
   return (
     <div style={{ padding: "20px 0" }}>
       <div style={{ padding: "0 24px 20px" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#f5f0ff", letterSpacing: "-0.02em", marginBottom: 8 }}>
-          Tu <em style={{ fontStyle: "italic", background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>diario</em>.
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#001a4d", letterSpacing: "-0.02em", marginBottom: 8 }}>
+          Tu <em style={{ fontStyle: "italic", background: "linear-gradient(135deg, #0066ff, #0099ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>diario</em>.
         </div>
-        <div style={{ fontSize: 13, color: "rgba(184,168,216,0.7)" }}>
+        <div style={{ fontSize: 13, color: "#334466" }}>
           {stats.total} sueño{stats.total !== 1 ? "s" : ""} materializados
         </div>
       </div>
@@ -923,16 +823,13 @@ function DiarioScreen({ dreams }) {
           { num: stats.public, label: "Públicos" },
           { num: `${stats.hours}h`, label: "Video" },
         ].map((item, i) => (
-          <div key={i} style={{
-            padding: "14px 0", borderRadius: 14, textAlign: "center",
-            background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.06)"
-          }}>
+          <div key={i} className="glass-card" style={{ padding: "14px 0", textAlign: "center" }}>
             <div style={{
               fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 300,
-              background: "linear-gradient(135deg, #ff7eb6, #b388ff)",
+              background: "linear-gradient(135deg, #0066ff, #0099ff)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
             }}>{item.num}</div>
-            <div style={{ fontSize: 10, color: "rgba(184,168,216,0.5)", marginTop: 4 }}>{item.label}</div>
+            <div style={{ fontSize: 10, color: "#334466", marginTop: 4 }}>{item.label}</div>
           </div>
         ))}
       </div>
@@ -940,10 +837,10 @@ function DiarioScreen({ dreams }) {
       <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 16 }}>
         {["all", "public", "private"].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
-            flex: 1, padding: "10px", borderRadius: 10, border: "0.5px solid rgba(255,255,255,0.08)",
-            background: filter === f ? "rgba(245,240,255,0.1)" : "rgba(255,255,255,0.03)",
-            color: filter === f ? "#f5f0ff" : "rgba(245,240,255,0.7)",
-            fontSize: 12, cursor: "pointer", transition: "all 0.3s", fontWeight: 500, fontFamily: "inherit"
+            flex: 1, padding: "10px", borderRadius: 10, border: "1.5px solid rgba(0,100,255,0.25)",
+            background: filter === f ? "rgba(0,100,255,0.1)" : "rgba(255,255,255,0.9)",
+            color: filter === f ? "#0066ff" : "#334466",
+            fontSize: 12, cursor: "pointer", transition: "all 0.2s ease", fontWeight: 500, fontFamily: "inherit"
           }}>
             {f === "all" ? "Todos" : f === "public" ? "Públicos" : "Privados"}
           </button>
@@ -952,38 +849,31 @@ function DiarioScreen({ dreams }) {
 
       <div style={{ padding: "0 16px" }}>
         {filteredDreams.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 20px", color: "rgba(184,168,216,0.5)", fontSize: 14 }}>
+          <div style={{ textAlign: "center", padding: "40px 20px", color: "#334466", fontSize: 14 }}>
             No hay sueños aquí
           </div>
         ) : (
-          filteredDreams.map(d => {
-            const s = getStyleById(d.style);
-            return (
-              <div key={d.id} style={{
-                display: "flex", gap: 12, padding: "14px 0",
-                borderBottom: "0.5px solid rgba(255,255,255,0.04)",
-              }}>
-                <DreamCard colors={s.colors} style={{ width: 56, height: 56, flexShrink: 0, borderRadius: 12 }}>
-                  <div style={{ width: 56, height: 56, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
-                    {s.icon}
-                  </div>
-                </DreamCard>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: "Georgia, serif", fontSize: 14, fontStyle: "italic", color: "#f5f0ff", lineHeight: 1.3, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    "{d.text}"
-                  </div>
-                  <div style={{ fontSize: 11, color: "rgba(184,168,216,0.5)", display: "flex", gap: 8, alignItems: "center" }}>
-                    <span>{d.createdAt}</span>
-                    <span>·</span>
-                    <span>{s.name}</span>
-                    <span>·</span>
-                    <span>8s</span>
-                    <span style={{ marginLeft: "auto" }}>{d.isPublic ? "🌍" : "🔒"}</span>
-                  </div>
+          filteredDreams.map(d => (
+            <div key={d.id} style={{
+              display: "flex", gap: 12, padding: "14px 0",
+              borderBottom: "1.5px solid rgba(0,100,255,0.1)",
+            }}>
+              <div className="glass-card" style={{ width: 56, height: 56, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
+                🌙
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: "Georgia, serif", fontSize: 14, fontStyle: "italic", color: "#001a4d", lineHeight: 1.3, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  "{d.text}"
+                </div>
+                <div style={{ fontSize: 11, color: "#334466", display: "flex", gap: 8, alignItems: "center" }}>
+                  <span>{d.createdAt}</span>
+                  <span>·</span>
+                  <span>8s</span>
+                  <span style={{ marginLeft: "auto" }}>{d.isPublic ? "🌍" : "🔒"}</span>
                 </div>
               </div>
-            );
-          })
+            </div>
+          ))
         )}
       </div>
     </div>
@@ -1002,47 +892,42 @@ function UniversoScreen({ dreams, currentUserId }) {
   return (
     <div style={{ padding: "20px 0" }}>
       <div style={{ padding: "0 24px 20px" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#f5f0ff", letterSpacing: "-0.02em", marginBottom: 8 }}>
-          <em style={{ fontStyle: "italic", background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Universo</em>.
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#001a4d", letterSpacing: "-0.02em", marginBottom: 8 }}>
+          <em style={{ fontStyle: "italic", background: "linear-gradient(135deg, #0066ff, #0099ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Universo</em>.
         </div>
-        <div style={{ fontSize: 13, color: "rgba(184,168,216,0.7)" }}>
+        <div style={{ fontSize: 13, color: "#334466" }}>
           {publicDreams.length} sueño{publicDreams.length !== 1 ? "s" : ""} compartido{publicDreams.length !== 1 ? "s" : ""}
         </div>
       </div>
 
       {publicDreams.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "40px 20px", color: "rgba(184,168,216,0.5)", fontSize: 14 }}>
+        <div style={{ textAlign: "center", padding: "40px 20px", color: "#334466", fontSize: 14 }}>
           Aún no hay sueños públicos. ¡Sé el primero!
         </div>
       ) : (
         publicDreams.map(d => {
-          const s = getStyleById(d.style);
           const liked = likedDreams[d.id];
           return (
-            <div key={d.id} style={{
-              margin: "0 16px 14px", padding: "16px",
-              background: "rgba(255,255,255,0.03)", backdropFilter: "blur(20px)",
-              borderRadius: 20, border: "0.5px solid rgba(255,255,255,0.06)"
-            }}>
+            <div key={d.id} className="glass-card" style={{ margin: "0 16px 14px", padding: "16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${s.colors[0]}, ${s.colors[1]})`,
+                  background: "linear-gradient(135deg, #0066ff, #0099ff)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 12, color: "white", fontWeight: 600
                 }}>U</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, color: "#f5f0ff", fontWeight: 500 }}>Usuario Dream</div>
-                  <div style={{ fontSize: 10, color: "rgba(184,168,216,0.4)" }}>@user_dreams</div>
+                  <div style={{ fontSize: 13, color: "#001a4d", fontWeight: 500 }}>Usuario Dream</div>
+                  <div style={{ fontSize: 10, color: "#334466" }}>@user_dreams</div>
                 </div>
                 <button style={{
                   fontSize: 11, padding: "4px 8px", borderRadius: 6,
-                  background: "rgba(179,136,255,0.1)", border: "0.5px solid rgba(179,136,255,0.2)",
-                  color: "rgba(179,136,255,0.8)", cursor: "pointer", fontFamily: "inherit"
+                  background: "rgba(0,100,255,0.08)", border: "1.5px solid rgba(0,100,255,0.25)",
+                  color: "#0066ff", cursor: "pointer", fontFamily: "inherit"
                 }}>+ Seguir</button>
               </div>
 
-              <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 12, background: "#000", aspectRatio: "16/9" }}>
+              <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#000", aspectRatio: "16/9" }}>
                 <video
                   src={d.videoUrl}
                   controls
@@ -1053,21 +938,21 @@ function UniversoScreen({ dreams, currentUserId }) {
 
               <div style={{
                 fontFamily: "Georgia, serif", fontSize: 15, fontStyle: "italic",
-                color: "rgba(245,240,255,0.8)", lineHeight: 1.4, marginBottom: 12
+                color: "#001a4d", lineHeight: 1.4, marginBottom: 12
               }}>
                 "{d.text}"
               </div>
 
               <div style={{ display: "flex", gap: 16, alignItems: "center", fontSize: 13 }}>
-                <div onClick={() => toggleLike(d.id)} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", color: liked ? "#ff7eb6" : "rgba(184,168,216,0.45)" }}>
+                <div onClick={() => toggleLike(d.id)} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", color: liked ? "#ff4477" : "#334466" }}>
                   <span>{liked ? "♥" : "♡"}</span>
                   <span>{liked ? (d.likes + 1) : d.likes}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(184,168,216,0.45)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#334466" }}>
                   <span>💬</span>
                   <span>{d.comments?.length || 0}</span>
                 </div>
-                <div style={{ marginLeft: "auto", color: "rgba(184,168,216,0.35)", cursor: "pointer" }}>⋯</div>
+                <div style={{ marginLeft: "auto", color: "#334466", cursor: "pointer" }}>⋯</div>
               </div>
             </div>
           );
@@ -1108,38 +993,34 @@ function ProfileScreen({ user, onUpgrade }) {
             alt={user.name}
             style={{
               width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px", display: "block",
-              objectFit: "cover", border: "2px solid rgba(179,136,255,0.4)",
-              boxShadow: "0 12px 36px rgba(153,102,255,0.3)"
+              objectFit: "cover", border: "2px solid rgba(0,100,255,0.4)",
+              boxShadow: "0 12px 36px rgba(0,100,255,0.2)"
             }}
           />
         ) : (
           <div style={{
             width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px",
-            background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
+            background: "linear-gradient(135deg, #0066ff, #0099ff)",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 36, color: "white", fontWeight: 300, fontFamily: "Georgia, serif",
-            boxShadow: "0 12px 36px rgba(153,102,255,0.3)"
+            boxShadow: "0 12px 36px rgba(0,100,255,0.2)"
           }}>{user.name.charAt(0).toUpperCase()}</div>
         )}
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 300, color: "#f5f0ff", marginBottom: 4 }}>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 300, color: "#001a4d", marginBottom: 4 }}>
           {user.name}
         </div>
-        <div style={{ fontSize: 12, color: "rgba(184,168,216,0.5)", marginBottom: 4 }}>
+        <div style={{ fontSize: 12, color: "#334466", marginBottom: 4 }}>
           {user.email}
         </div>
       </div>
 
       {/* Plan card */}
-      <div style={{
-        margin: "0 16px 16px", padding: 24, borderRadius: 20,
-        background: "linear-gradient(135deg, rgba(107,31,184,0.12), rgba(200,48,126,0.08), rgba(64,128,255,0.12))",
-        border: "0.5px solid rgba(255,255,255,0.1)"
-      }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "rgba(184,168,216,0.6)", marginBottom: 8, textTransform: "uppercase" }}>TU PLAN</div>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#f5f0ff", marginBottom: 6, textTransform: "capitalize" }}>
+      <div className="glass-card" style={{ margin: "0 16px 16px", padding: 24 }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", marginBottom: 8, textTransform: "uppercase", fontWeight: 600 }}>TU PLAN</div>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#001a4d", marginBottom: 6, textTransform: "capitalize" }}>
           {user.plan === "free" ? "Explorador" : user.plan === "soñador" ? "Soñador" : "Visionario"}
         </div>
-        <div style={{ fontSize: 12, color: "rgba(184,168,216,0.7)", marginBottom: 16, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 12, color: "#334466", marginBottom: 16, lineHeight: 1.5 }}>
           {user.plan === "free"
             ? "1 video de prueba de 8s · Sin face swap"
             : user.plan === "soñador"
@@ -1148,11 +1029,8 @@ function ProfileScreen({ user, onUpgrade }) {
           }
         </div>
         {user.plan === "free" && (
-          <button onClick={onUpgrade} style={{
-            width: "100%", padding: 14, borderRadius: 14, cursor: "pointer",
-            background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)",
-            color: "white", fontSize: 14, fontWeight: 500, border: "none",
-            boxShadow: "0 8px 24px rgba(153,102,255,0.3)", transition: "all 0.3s",
+          <button className="btn-primary" onClick={onUpgrade} style={{
+            width: "100%", padding: 14, fontSize: 14, fontWeight: 500,
             fontFamily: "inherit"
           }}>
             ✦ Suscribirse — $12.99/mes
@@ -1164,10 +1042,10 @@ function ProfileScreen({ user, onUpgrade }) {
       {infoMessage && (
         <div
           onClick={() => setInfoMessage("")}
+          className="glass-card"
           style={{
-            margin: "0 16px 16px", padding: "14px 16px", borderRadius: 14, cursor: "pointer",
-            background: "rgba(179,136,255,0.1)", border: "0.5px solid rgba(179,136,255,0.25)",
-            fontSize: 13, color: "rgba(245,240,255,0.85)", lineHeight: 1.5
+            margin: "0 16px 16px", padding: "14px 16px", cursor: "pointer",
+            fontSize: 13, color: "#001a4d", lineHeight: 1.5
           }}
         >
           {infoMessage}
@@ -1182,29 +1060,29 @@ function ProfileScreen({ user, onUpgrade }) {
             onClick={() => handleItemClick(item.label)}
             style={{
               display: "flex", alignItems: "center", gap: 12, padding: "14px 8px",
-              borderBottom: "0.5px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "all 0.3s"
+              borderBottom: "1.5px solid rgba(0,100,255,0.1)", cursor: "pointer", transition: "all 0.2s ease"
             }}
           >
             <div style={{
               width: 40, height: 40, borderRadius: 12,
-              background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(255,255,255,0.06)",
+              background: "rgba(0,100,255,0.06)", border: "1.5px solid rgba(0,100,255,0.15)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18
             }}>{item.icon}</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 14, color: "#f5f0ff", fontWeight: 500 }}>{item.label}</span>
+                <span style={{ fontSize: 14, color: "#001a4d", fontWeight: 500 }}>{item.label}</span>
                 {item.badge && (
                   <span style={{
                     fontSize: 9, padding: "2px 6px", borderRadius: 6,
-                    background: "rgba(179,136,255,0.15)", border: "0.5px solid rgba(179,136,255,0.3)",
-                    color: "rgba(179,136,255,0.9)", fontWeight: 600, letterSpacing: "0.05em",
+                    background: "rgba(0,100,255,0.1)", border: "1.5px solid rgba(0,100,255,0.25)",
+                    color: "#0066ff", fontWeight: 600, letterSpacing: "0.05em",
                     textTransform: "uppercase"
                   }}>Próximamente</span>
                 )}
               </div>
-              <div style={{ fontSize: 11, color: "rgba(184,168,216,0.5)" }}>{item.desc}</div>
+              <div style={{ fontSize: 11, color: "#334466" }}>{item.desc}</div>
             </div>
-            <span style={{ fontSize: 18, color: "rgba(184,168,216,0.3)" }}>›</span>
+            <span style={{ fontSize: 18, color: "#0066ff" }}>›</span>
           </div>
         ))}
       </div>
@@ -1214,16 +1092,16 @@ function ProfileScreen({ user, onUpgrade }) {
           onClick={() => signOut()}
           style={{
             width: "100%", padding: "14px", borderRadius: 14, cursor: "pointer",
-            background: "rgba(255,80,80,0.08)", border: "0.5px solid rgba(255,80,80,0.2)",
-            color: "rgba(255,120,120,0.85)", fontSize: 14, fontWeight: 500,
-            fontFamily: "inherit", transition: "all 0.3s"
+            background: "rgba(255,60,60,0.06)", border: "1.5px solid rgba(255,60,60,0.2)",
+            color: "#cc3333", fontSize: 14, fontWeight: 500,
+            fontFamily: "inherit", transition: "all 0.2s ease"
           }}
         >
           Cerrar sesión
         </button>
       </div>
 
-      <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: "rgba(184,168,216,0.25)" }}>
+      <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: "#7799cc" }}>
         Astra · v1.3.0<br />Hecho con magia ✨ en México
       </div>
     </div>
@@ -1236,49 +1114,48 @@ function LoginScreen() {
     <div style={{
       minHeight: "100vh", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", padding: "40px 24px",
-      background: "#000", position: "relative", overflow: "hidden"
+      background: "#f0f5ff", position: "relative", overflow: "hidden"
     }}>
-      <Nebula />
-      <Stars />
+      <GlobalStyles />
       <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: 380, textAlign: "center" }}>
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>✦</div>
           <div style={{
             fontFamily: "Georgia, serif", fontSize: 36, fontWeight: 300,
-            background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)",
+            background: "linear-gradient(135deg, #0066ff, #0099ff)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             marginBottom: 8
           }}>Astra</div>
-          <div style={{ fontSize: 14, color: "rgba(184,168,216,0.6)", fontStyle: "italic" }}>
+          <div style={{ fontSize: 14, color: "#0044aa", fontStyle: "italic" }}>
             Materializa tus sueños con IA
           </div>
         </div>
-        <div style={{ borderRadius: 20, overflow: "hidden" }}>
+        <div className="glass-card" style={{ overflow: "hidden" }}>
           <SignIn
             appearance={{
               variables: {
-                colorPrimary: "#9966ff",
-                colorBackground: "#0d0d1a",
-                colorText: "#f5f0ff",
-                colorTextSecondary: "rgba(184,168,216,0.7)",
-                colorInputBackground: "rgba(255,255,255,0.05)",
-                colorInputText: "#f5f0ff",
-                borderRadius: "14px",
+                colorPrimary: "#0066ff",
+                colorBackground: "#ffffff",
+                colorText: "#001a4d",
+                colorTextSecondary: "#334466",
+                colorInputBackground: "rgba(0,100,255,0.04)",
+                colorInputText: "#001a4d",
+                borderRadius: "12px",
                 fontFamily: "Inter, sans-serif",
               },
               elements: {
-                card: { background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.08)", boxShadow: "none" },
-                headerTitle: { color: "#f5f0ff" },
-                headerSubtitle: { color: "rgba(184,168,216,0.6)" },
+                card: { background: "transparent", boxShadow: "none" },
+                headerTitle: { color: "#001a4d" },
+                headerSubtitle: { color: "#334466" },
                 socialButtonsBlockButton: {
-                  background: "rgba(255,255,255,0.05)",
-                  border: "0.5px solid rgba(255,255,255,0.1)",
-                  color: "#f5f0ff",
+                  background: "rgba(0,100,255,0.06)",
+                  border: "1.5px solid rgba(0,100,255,0.2)",
+                  color: "#001a4d",
                 },
-                dividerLine: { background: "rgba(255,255,255,0.08)" },
-                dividerText: { color: "rgba(184,168,216,0.4)" },
-                formButtonPrimary: { background: "linear-gradient(135deg, #ff5599, #9966ff, #4477ff)", border: "none" },
-                footerActionLink: { color: "#b388ff" },
+                dividerLine: { background: "rgba(0,100,255,0.15)" },
+                dividerText: { color: "#7799cc" },
+                formButtonPrimary: { background: "linear-gradient(135deg, #0066ff, #0099ff)", border: "none" },
+                footerActionLink: { color: "#0066ff" },
               }
             }}
           />
@@ -1358,9 +1235,9 @@ export default function Astra() {
 
   if (!isLoaded) {
     return (
-      <div style={{ minHeight: "100vh", background: "#000", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Nebula /><Stars />
-        <div style={{ position: "relative", zIndex: 2, color: "rgba(184,168,216,0.5)", fontStyle: "italic" }}>Cargando...</div>
+      <div style={{ minHeight: "100vh", background: "#f0f5ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <GlobalStyles />
+        <div style={{ color: "#0044aa", fontStyle: "italic" }}>Cargando...</div>
       </div>
     );
   }
@@ -1379,23 +1256,10 @@ export default function Astra() {
   return (
     <div style={{
       width: "100%", maxWidth: 430, margin: "0 auto",
-      minHeight: "100vh", background: "#000",
+      minHeight: "100vh", background: "#f0f5ff",
       position: "relative", overflow: "hidden", fontFamily: "'Inter', sans-serif"
     }}>
-      <Nebula />
-      <Stars />
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        textarea::placeholder { color: rgba(184,168,216,0.35); }
-        input::placeholder { color: rgba(184,168,216,0.35); }
-        ::-webkit-scrollbar { display: none; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-      `}</style>
+      <GlobalStyles />
 
       <div style={{ position: "relative", zIndex: 2, paddingBottom: 100, minHeight: "100vh" }}>
         {tab === "sonar" && (
@@ -1413,13 +1277,11 @@ export default function Astra() {
         {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} />}
       </div>
 
-      <div style={{
+      <div className="navbar-glass" style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430,
         display: "flex", justifyContent: "space-around",
         padding: "12px 0 28px",
-        borderTop: "0.5px solid rgba(255,255,255,0.06)",
-        background: "rgba(0,0,0,0.8)", backdropFilter: "blur(24px)",
         zIndex: 100
       }}>
         {tabs.map(t => (
@@ -1429,20 +1291,20 @@ export default function Astra() {
             style={{
               display: "flex", flexDirection: "column", alignItems: "center",
               gap: 4, padding: "6px 16px", cursor: "pointer",
-              transition: "all 0.3s"
+              transition: "all 0.2s ease"
             }}
           >
             <span style={{
               fontSize: 24,
-              opacity: tab === t.id ? 1 : 0.35,
-              filter: tab === t.id ? "none" : "grayscale(1)",
-              transition: "all 0.3s"
+              opacity: tab === t.id ? 1 : 0.4,
+              filter: tab === t.id ? "none" : "grayscale(0.6)",
+              transition: "all 0.2s ease"
             }}>{t.icon}</span>
             <span style={{
               fontSize: 9, fontWeight: 600,
               letterSpacing: "0.06em",
-              color: tab === t.id ? "#f5f0ff" : "rgba(184,168,216,0.35)",
-              transition: "color 0.3s",
+              color: tab === t.id ? "#0066ff" : "#7799cc",
+              transition: "color 0.2s ease",
               textTransform: "uppercase"
             }}>{t.label}</span>
           </div>
