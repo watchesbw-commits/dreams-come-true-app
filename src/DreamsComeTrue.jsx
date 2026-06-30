@@ -61,6 +61,13 @@ const GENERATING_MESSAGES = [
   "Casi listo, tu sueño despierta...",
 ];
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return "Buenos días";
+  if (hour >= 12 && hour < 19) return "Buenas tardes";
+  return "Buenas noches";
+};
+
 // ============ UTILS ============
 const useLocalStorage = (key, initialValue) => {
   const [storedValue, setStoredValue] = useState(() => {
@@ -152,13 +159,63 @@ function Button({ children, onClick, variant = "primary", style: extraStyle = {}
 
 // ============ SOÑAR SCREEN ============
 function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubscribe, subscriptionMessage }) {
+  const { user: clerkUser } = useUser();
+  const userId = clerkUser?.id || user.id;
+
   const [dreamText, setDreamText] = useState("");
-  const [selectedStyle, setSelectedStyle] = useState("cyber");
   const [isPublic, setIsPublic] = useState(false);
+  const [greeting, setGreeting] = useState(getGreeting);
+
+  useEffect(() => {
+    const interval = setInterval(() => setGreeting(getGreeting()), 60000);
+    return () => clearInterval(interval);
+  }, []);
   const [generating, setGenerating] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [resultData, setResultData] = useState(null);
   const [error, setError] = useState("");
+
+  const [faceImage, setFaceImage] = useLocalStorage(`faceImage_${userId}`, null);
+  const [faceElementId, setFaceElementId] = useLocalStorage(`faceElementId_${userId}`, null);
+  const [includeFace, setIncludeFace] = useLocalStorage(`includeFace_${userId}`, false);
+  const [uploadingFace, setUploadingFace] = useState(false);
+  const [faceError, setFaceError] = useState("");
+  const faceInputRef = useRef(null);
+
+  const handleFaceFileChange = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFaceError("");
+    setUploadingFace(true);
+
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+        reader.readAsDataURL(file);
+      });
+
+      const resp = await callAPI("/api/user/upload-face", "POST", {
+        userId,
+        image: base64,
+      });
+
+      if (resp?.elementId) {
+        setFaceElementId(resp.elementId);
+        setFaceImage(base64);
+        setIncludeFace(true);
+      } else {
+        setFaceError("No se pudo subir la foto. Intenta de nuevo.");
+      }
+    } catch {
+      setFaceError("No se pudo subir la foto. Intenta de nuevo.");
+    } finally {
+      setUploadingFace(false);
+      if (faceInputRef.current) faceInputRef.current.value = "";
+    }
+  }, [userId, setFaceElementId, setFaceImage, setIncludeFace]);
 
   const hasActiveSubscription = subscriptionStatus === "active";
   const hasCredits = credits !== null && credits > 0;
@@ -182,15 +239,16 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     setError("");
     setGenerating(true);
 
-    const styleData = getStyleById(selectedStyle);
+    const styleData = getStyleById("cyber");
     const fullPrompt = styleData?.prompt ? `${dreamText}, ${styleData.prompt}` : dreamText;
 
     let startResp = null;
     for (let attempt = 0; attempt < 4; attempt++) {
       startResp = await callAPI("/api/dreams/generate", "POST", {
         text: fullPrompt,
-        style: selectedStyle,
+        style: "cyber",
         userId: user.id,
+        ...(includeFace && faceElementId ? { incluirCara: true, elementId: faceElementId } : {}),
       });
       if (startResp?._status === 402) {
         setGenerating(false);
@@ -239,7 +297,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     const newDream = {
       id: Date.now(),
       text: dreamText,
-      style: selectedStyle,
+      style: "cyber",
       duration: 8,
       isPublic,
       createdAt: new Date().toLocaleDateString('es-ES'),
@@ -259,9 +317,9 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     setGenerating(false);
     setShowResult(true);
     onDreamCreated(newDream, updatedUser);
-  }, [dreamText, isPublic, selectedStyle, user, canGenerate, onDreamCreated]);
+  }, [dreamText, isPublic, user, canGenerate, onDreamCreated, includeFace, faceElementId]);
 
-  if (generating) return <GeneratingScreen style={selectedStyle} />;
+  if (generating) return <GeneratingScreen style="cyber" />;
   if (showResult && resultData) {
     return (
       <ResultScreen
@@ -280,7 +338,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           {new Date().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase()}
         </div>
         <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#f5f0ff", lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 8 }}>
-          Buenos días,<br />
+          {greeting},<br />
           <em style={{
             fontStyle: "italic",
             background: "linear-gradient(135deg, #ff7eb6, #b388ff, #80b0ff)",
@@ -318,6 +376,80 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           }}>
             {credits === null ? "Cargando..." : "Sin suscripción activa"}
           </div>
+        )}
+      </div>
+
+      {/* Foto del usuario */}
+      <div style={{
+        margin: "0 16px 16px", padding: "16px",
+        background: "rgba(255,255,255,0.03)", backdropFilter: "blur(20px)",
+        borderRadius: 20, border: "0.5px solid rgba(255,255,255,0.08)",
+      }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "rgba(184,168,216,0.5)", textTransform: "uppercase", marginBottom: 12 }}>
+          ¿Quieres aparecer en tu sueño?
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {faceImage ? (
+            <img
+              src={faceImage}
+              alt="Tu rostro"
+              style={{
+                width: 56, height: 56, borderRadius: "50%", objectFit: "cover",
+                border: "1.5px solid rgba(179,136,255,0.4)", flexShrink: 0
+              }}
+            />
+          ) : (
+            <div style={{
+              width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
+              background: "rgba(179,136,255,0.1)", border: "0.5px solid rgba(179,136,255,0.25)",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22
+            }}>📷</div>
+          )}
+
+          <div style={{ flex: 1 }}>
+            {faceImage && (
+              <div
+                onClick={() => setIncludeFace(!includeFace)}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", marginBottom: 10 }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 500, color: "#f5f0ff" }}>Aparecer en mi sueño</span>
+                <div style={{
+                  width: 38, height: 22, borderRadius: 11, position: "relative", flexShrink: 0,
+                  background: includeFace ? "rgba(179,136,255,0.4)" : "rgba(245,240,255,0.15)",
+                  border: "0.5px solid rgba(245,240,255,0.3)", transition: "background 0.3s"
+                }}>
+                  <div style={{
+                    width: 16, height: 16, borderRadius: "50%", background: "rgba(245,240,255,0.95)",
+                    position: "absolute", top: 3, left: includeFace ? 19 : 3, transition: "left 0.3s", boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
+                  }} />
+                </div>
+              </div>
+            )}
+            <button
+              onClick={() => faceInputRef.current?.click()}
+              disabled={uploadingFace}
+              style={{
+                padding: "8px 14px", borderRadius: 10, border: "0.5px solid rgba(179,136,255,0.3)",
+                background: "rgba(179,136,255,0.1)", color: "rgba(179,136,255,0.9)",
+                fontSize: 12, fontWeight: 500, cursor: uploadingFace ? "default" : "pointer",
+                fontFamily: "inherit", opacity: uploadingFace ? 0.6 : 1
+              }}
+            >
+              {uploadingFace ? "Subiendo..." : faceImage ? "Cambiar foto" : "Subir foto"}
+            </button>
+          </div>
+        </div>
+
+        <input
+          ref={faceInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFaceFileChange}
+          style={{ display: "none" }}
+        />
+
+        {faceError && (
+          <div style={{ marginTop: 10, fontSize: 11, color: "#ff6347" }}>{faceError}</div>
         )}
       </div>
 
@@ -391,35 +523,36 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           ELIGE TU UNIVERSO
         </div>
         <div style={{ display: "flex", gap: 8, padding: "0 16px", overflowX: "auto", scrollbarWidth: "none" }}>
-          {STYLES.map(s => (
+          {STYLES.map(s => {
+            const isSelected = s.id === "cyber";
+            return (
             <div
               key={s.id}
-              onClick={() => setSelectedStyle(s.id)}
               style={{
                 flexShrink: 0, width: 76, aspectRatio: "3/4", borderRadius: 14,
-                position: "relative", overflow: "hidden", cursor: "pointer",
-                border: selectedStyle === s.id ? "1.5px solid rgba(245,240,255,0.9)" : "0.5px solid rgba(255,255,255,0.08)",
-                boxShadow: selectedStyle === s.id ? `0 0 18px ${s.colors[0]}66, 0 0 4px rgba(245,240,255,0.25)` : "none",
-                transform: selectedStyle === s.id ? "scale(1.06)" : "scale(1)",
+                position: "relative", overflow: "hidden",
+                border: isSelected ? "1.5px solid rgba(245,240,255,0.9)" : "0.5px solid rgba(255,255,255,0.08)",
+                boxShadow: isSelected ? `0 0 18px ${s.colors[0]}66, 0 0 4px rgba(245,240,255,0.25)` : "none",
+                transform: isSelected ? "scale(1.06)" : "scale(1)",
                 transition: "all 0.25s"
               }}
             >
               <div style={{
                 position: "absolute", inset: 0,
-                opacity: selectedStyle === s.id ? 1 : 0.65,
+                opacity: isSelected ? 1 : 0.65,
                 mixBlendMode: "screen",
                 background: `radial-gradient(circle at 30% 30%, ${s.colors[0]}, transparent 60%), radial-gradient(circle at 70% 70%, ${s.colors[1]}, transparent 60%)`
               }} />
-              {selectedStyle === s.id && (
+              {isSelected && (
                 <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.06)", borderRadius: 13 }} />
               )}
               <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
                 <div style={{ fontSize: 22 }}>{s.icon}</div>
-                <div style={{ fontSize: 9, fontWeight: selectedStyle === s.id ? 700 : 500, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.6)", textAlign: "center" }}>
+                <div style={{ fontSize: 9, fontWeight: isSelected ? 700 : 500, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.6)", textAlign: "center" }}>
                   {s.name}
                 </div>
               </div>
-              {selectedStyle === s.id && (
+              {isSelected && (
                 <div style={{
                   position: "absolute", bottom: 5, left: "50%", transform: "translateX(-50%)",
                   width: 4, height: 4, borderRadius: "50%",
@@ -427,7 +560,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
                 }} />
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
