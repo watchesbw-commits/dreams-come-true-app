@@ -71,8 +71,118 @@ const useLocalStorage = (key, initialValue) => {
   return [storedValue, setValue];
 };
 
-// ============ GLOBAL STYLES (white glass 3D) ============
-function GlobalStyles() {
+const computeIsNight = () => {
+  const hour = new Date().getHours();
+  return hour >= 20 || hour < 6;
+};
+
+const useIsNight = () => {
+  const [isDarkMode, setIsDarkMode] = useState(computeIsNight);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsDarkMode(computeIsNight());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return isDarkMode;
+};
+
+// ============ THEME ============
+function getTheme(isDarkMode) {
+  return isDarkMode ? {
+    bg: "#080612",
+    textPrimary: "#f0f0ff",
+    textSecondary: "rgba(255,255,255,0.45)",
+    label: "#c084fc",
+    accentGradient: "linear-gradient(135deg, #7c3aed, #a855f7)",
+    accentSolid: "#a855f7",
+    cardBg: "rgba(255,255,255,0.04)",
+    cardBorder: "rgba(168,85,247,0.25)",
+    cardShadow: "0 0 0 1px rgba(168,85,247,0.15), 0 4px 24px rgba(139,92,246,0.1)",
+    cardHoverShadow: "0 0 0 1px rgba(168,85,247,0.4), 0 8px 32px rgba(139,92,246,0.2)",
+    inputBg: "rgba(255,255,255,0.04)",
+    inputBorder: "rgba(168,85,247,0.25)",
+    inputFocusBorder: "rgba(168,85,247,0.6)",
+    inputFocusShadow: "0 0 0 3px rgba(168,85,247,0.15)",
+    placeholder: "rgba(200,180,255,0.3)",
+    btnGradient: "linear-gradient(135deg, #7c3aed, #a855f7)",
+    btnShadow: "0 4px 16px rgba(139,92,246,0.4)",
+    btnHoverShadow: "0 6px 20px rgba(139,92,246,0.5)",
+    navbarBg: "rgba(8,6,18,0.9)",
+    navbarBorder: "rgba(168,85,247,0.15)",
+    pillBg: "rgba(168,85,247,0.1)",
+    pillBorder: "rgba(168,85,247,0.3)",
+    pillText: "#c084fc",
+    mutedBg: "rgba(168,85,247,0.08)",
+    mutedBorder: "rgba(168,85,247,0.15)",
+    iconBg: "rgba(168,85,247,0.1)",
+    iconBorder: "rgba(168,85,247,0.25)",
+    toggleOffBg: "rgba(168,85,247,0.12)",
+    errorBg: "rgba(255,80,80,0.1)",
+    errorBorder: "rgba(255,80,80,0.35)",
+    errorText: "#ff8080",
+    successText: "#34d399",
+    successBg: "rgba(52,211,153,0.1)",
+    successBorder: "rgba(52,211,153,0.4)",
+    inactiveTab: "rgba(255,255,255,0.35)",
+    orbGradient: "radial-gradient(circle, rgba(139,92,246,0.35), rgba(168,85,247,0.18), transparent)",
+    orbShadow: "0 0 80px rgba(139,92,246,0.25), 0 0 120px rgba(168,85,247,0.12)",
+    ringColor1: "rgba(168,85,247,0.25)",
+    ringColor2: "rgba(168,85,247,0.15)",
+    starColor: "#a855f7",
+    starGlow: "rgba(139,92,246,0.6)",
+    progressTrackBg: "rgba(168,85,247,0.1)",
+  } : {
+    bg: "#f0f5ff",
+    textPrimary: "#001a4d",
+    textSecondary: "#334466",
+    label: "#0066ff",
+    accentGradient: "linear-gradient(135deg, #0066ff, #0099ff)",
+    accentSolid: "#0066ff",
+    cardBg: "rgba(255,255,255,0.9)",
+    cardBorder: "rgba(0,100,255,0.4)",
+    cardShadow: "0 0 0 1.5px rgba(0,100,255,0.4), 0 4px 24px rgba(0,100,255,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+    cardHoverShadow: "0 0 0 1.5px rgba(0,150,255,0.6), 0 8px 32px rgba(0,100,255,0.15), inset 0 1px 0 rgba(255,255,255,0.9)",
+    inputBg: "rgba(255,255,255,0.95)",
+    inputBorder: "rgba(0,100,255,0.25)",
+    inputFocusBorder: "rgba(0,100,255,0.6)",
+    inputFocusShadow: "0 0 0 3px rgba(0,100,255,0.1)",
+    placeholder: "rgba(0,80,200,0.3)",
+    btnGradient: "linear-gradient(135deg, #0066ff, #0099ff)",
+    btnShadow: "0 4px 16px rgba(0,100,255,0.35)",
+    btnHoverShadow: "0 6px 20px rgba(0,100,255,0.45)",
+    navbarBg: "rgba(255,255,255,0.95)",
+    navbarBorder: "rgba(0,100,255,0.2)",
+    pillBg: "rgba(0,100,255,0.08)",
+    pillBorder: "rgba(0,100,255,0.25)",
+    pillText: "#0066ff",
+    mutedBg: "rgba(0,68,170,0.06)",
+    mutedBorder: "rgba(0,100,255,0.15)",
+    iconBg: "rgba(0,100,255,0.1)",
+    iconBorder: "rgba(0,100,255,0.25)",
+    toggleOffBg: "rgba(0,68,170,0.12)",
+    errorBg: "rgba(255,80,80,0.08)",
+    errorBorder: "rgba(255,80,80,0.3)",
+    errorText: "#cc3333",
+    successText: "#008844",
+    successBg: "rgba(0,200,120,0.08)",
+    successBorder: "rgba(0,200,120,0.4)",
+    inactiveTab: "#7799cc",
+    orbGradient: "radial-gradient(circle, rgba(0,100,255,0.35), rgba(0,150,255,0.18), transparent)",
+    orbShadow: "0 0 80px rgba(0,100,255,0.25), 0 0 120px rgba(0,150,255,0.12)",
+    ringColor1: "rgba(0,100,255,0.25)",
+    ringColor2: "rgba(0,100,255,0.15)",
+    starColor: "#0066ff",
+    starGlow: "rgba(0,100,255,0.6)",
+    progressTrackBg: "rgba(0,100,255,0.1)",
+  };
+}
+
+// ============ GLOBAL STYLES (white glass 3D / dream night) ============
+function GlobalStyles({ isDarkMode }) {
+  const t = getTheme(isDarkMode);
   return (
     <style>{`
       * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -85,67 +195,74 @@ function GlobalStyles() {
       @keyframes starFloat { from { transform: translateY(0) scale(1); opacity: 0.4; } to { transform: translateY(-14px) scale(1.5); opacity: 1; } }
 
       .glass-card {
-        background: rgba(255,255,255,0.9);
+        background: ${t.cardBg};
         border: 1.5px solid transparent;
         border-radius: 16px;
         background-clip: padding-box;
-        box-shadow:
-          0 0 0 1.5px rgba(0,100,255,0.4),
-          0 4px 24px rgba(0,100,255,0.08),
-          inset 0 1px 0 rgba(255,255,255,0.8);
-        transition: all 0.2s ease;
+        box-shadow: ${t.cardShadow};
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.5s ease;
       }
       .glass-card:hover {
         transform: translateY(-2px);
-        box-shadow:
-          0 0 0 1.5px rgba(0,150,255,0.6),
-          0 8px 32px rgba(0,100,255,0.15),
-          inset 0 1px 0 rgba(255,255,255,0.9);
+        box-shadow: ${t.cardHoverShadow};
       }
 
       .glass-input {
-        background: rgba(255,255,255,0.95);
-        border: 1.5px solid rgba(0,100,255,0.25);
+        background: ${t.inputBg};
+        border: 1.5px solid ${t.inputBorder};
         border-radius: 12px;
-        color: #001a4d;
-        transition: all 0.2s ease;
+        color: ${t.textPrimary};
+        transition: all 0.5s ease;
       }
-      .glass-input::placeholder { color: rgba(0,80,200,0.3); }
+      .glass-input::placeholder { color: ${t.placeholder}; }
       .glass-input:focus {
         outline: none;
-        border-color: rgba(0,100,255,0.6);
-        box-shadow: 0 0 0 3px rgba(0,100,255,0.1);
+        border-color: ${t.inputFocusBorder};
+        box-shadow: ${t.inputFocusShadow};
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #0066ff, #0099ff);
+        background: ${t.btnGradient};
         color: white;
         border: none;
         border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0,100,255,0.35);
+        box-shadow: ${t.btnShadow};
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.5s ease;
       }
-      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,100,255,0.45); }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: ${t.btnHoverShadow}; }
 
       .navbar-glass {
-        background: rgba(255,255,255,0.95);
-        border-top: 1.5px solid rgba(0,100,255,0.2);
+        background: ${t.navbarBg};
+        border-top: 1.5px solid ${t.navbarBorder};
         backdrop-filter: blur(10px);
+        transition: all 0.5s ease;
       }
 
       .credits-pill {
-        background: rgba(0,100,255,0.08);
-        border: 1.5px solid rgba(0,100,255,0.25);
+        background: ${t.pillBg};
+        border: 1.5px solid ${t.pillBorder};
         border-radius: 20px;
-        color: #0066ff;
+        color: ${t.pillText};
+        transition: all 0.5s ease;
       }
     `}</style>
   );
 }
 
+function NightStars() {
+  return (
+    <div style={{
+      position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
+      backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)",
+      backgroundSize: "28px 28px"
+    }} />
+  );
+}
+
 // ============ SOÑAR SCREEN ============
-function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubscribe, subscriptionMessage }) {
+function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubscribe, subscriptionMessage, isDarkMode }) {
+  const t = getTheme(isDarkMode);
   const { user: clerkUser } = useUser();
   const userId = clerkUser?.id || user.id;
 
@@ -301,12 +418,13 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     onDreamCreated(newDream, updatedUser);
   }, [dreamText, isPublic, user, canGenerate, onDreamCreated, includeFace, faceElementId]);
 
-  if (generating) return <GeneratingScreen />;
+  if (generating) return <GeneratingScreen isDarkMode={isDarkMode} />;
   if (showResult && resultData) {
     return (
       <ResultScreen
         dream={resultData.dream}
         user={resultData.user}
+        isDarkMode={isDarkMode}
         onBack={() => { setShowResult(false); setDreamText(""); setError(""); }}
       />
     );
@@ -316,14 +434,14 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     <div style={{ padding: "0 0 20px" }}>
       {/* Header */}
       <div style={{ padding: "24px 24px 12px" }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.22em", color: "#0066ff", textTransform: "uppercase", marginBottom: 4, fontWeight: 600 }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.22em", color: t.label, textTransform: "uppercase", marginBottom: 4, fontWeight: 600, transition: "color 0.5s ease" }}>
           {new Date().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase()}
         </div>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#001a4d", lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 8 }}>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: t.textPrimary, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 8, transition: "color 0.5s ease" }}>
           {greeting},<br />
           <em style={{
             fontStyle: "italic",
-            background: "linear-gradient(135deg, #0066ff, #0099ff)",
+            background: t.accentGradient,
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
           }}>{user.name.split(" ")[0]}</em>.
         </div>
@@ -332,9 +450,9 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
       {subscriptionMessage && (
         <div className="glass-card" style={{
           margin: "0 16px 12px", padding: "12px 14px",
-          background: "rgba(0,200,120,0.08)",
-          boxShadow: "0 0 0 1.5px rgba(0,200,120,0.4), 0 4px 24px rgba(0,200,120,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
-          fontSize: 13, color: "#008844", textAlign: "center", fontWeight: 500
+          background: t.successBg,
+          boxShadow: `0 0 0 1.5px ${t.successBorder}, 0 4px 24px ${t.successBg}`,
+          fontSize: 13, color: t.successText, textAlign: "center", fontWeight: 500
         }}>
           {subscriptionMessage}
         </div>
@@ -349,8 +467,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         ) : (
           <div style={{
             padding: "10px 12px", borderRadius: 20,
-            background: "rgba(0,68,170,0.06)", border: "1.5px solid rgba(0,100,255,0.15)",
-            fontSize: 12, color: "#334466"
+            background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
+            fontSize: 12, color: t.textSecondary, transition: "all 0.5s ease"
           }}>
             {credits === null ? "Cargando..." : "Sin suscripción activa"}
           </div>
@@ -359,8 +477,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
       {/* Dream input */}
       <div className="glass-card" style={{ margin: "0 16px 8px", padding: "16px" }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
-          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#0066ff", boxShadow: "0 0 8px #0066ff", animation: "pulse 2s infinite" }} />
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: t.label, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6, fontWeight: 600, transition: "color 0.5s ease" }}>
+          <span style={{ width: 4, height: 4, borderRadius: "50%", background: t.label, boxShadow: `0 0 8px ${t.label}`, animation: "pulse 2s infinite" }} />
           DESCRIBE TU SUEÑO
         </div>
         <textarea
@@ -379,13 +497,13 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{
               width: 32, height: 32, borderRadius: "50%",
-              background: "rgba(0,100,255,0.1)", border: "1.5px solid rgba(0,100,255,0.25)",
+              background: t.iconBg, border: `1.5px solid ${t.iconBorder}`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#0066ff", fontSize: 16, cursor: "pointer", transition: "all 0.2s ease"
+              color: t.label, fontSize: 16, cursor: "pointer", transition: "all 0.5s ease"
             }}>🎤</div>
-            <span style={{ fontSize: 11, color: "#334466" }}>o di tu sueño</span>
+            <span style={{ fontSize: 11, color: t.textSecondary, transition: "color 0.5s ease" }}>o di tu sueño</span>
           </div>
-          <span style={{ fontSize: 10, color: "#0044aa" }}>{dreamText.length}/500</span>
+          <span style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>{dreamText.length}/500</span>
         </div>
       </div>
 
@@ -397,8 +515,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
             onClick={() => { setDreamText(s); setError(""); }}
             style={{
               padding: "6px 12px", borderRadius: 20, cursor: "pointer",
-              background: "rgba(0,100,255,0.06)", border: "1.5px solid rgba(0,100,255,0.2)",
-              fontSize: 11, color: "#0044aa", transition: "all 0.2s ease",
+              background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
+              fontSize: 11, color: t.label, transition: "all 0.5s ease",
               whiteSpace: "nowrap"
             }}
           >
@@ -410,8 +528,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
       {error && (
         <div style={{
           margin: "0 16px 12px", padding: "12px 14px", borderRadius: 12,
-          background: "rgba(255,80,80,0.08)", border: "1.5px solid rgba(255,80,80,0.3)",
-          fontSize: 12, color: "#cc3333"
+          background: t.errorBg, border: `1.5px solid ${t.errorBorder}`,
+          fontSize: 12, color: t.errorText, transition: "all 0.5s ease"
         }}>
           {error}
         </div>
@@ -429,22 +547,22 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{
             width: 32, height: 32, borderRadius: 10,
-            background: isPublic ? "rgba(0,100,255,0.12)" : "rgba(0,68,170,0.08)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16
+            background: isPublic ? t.iconBg : t.mutedBg,
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, transition: "all 0.5s ease"
           }}>{isPublic ? "🌍" : "🔒"}</div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: "#001a4d" }}>
+            <div style={{ fontSize: 12, fontWeight: 500, color: t.textPrimary, transition: "color 0.5s ease" }}>
               {isPublic ? "Compartir en Universo" : "Solo para ti"}
             </div>
-            <div style={{ fontSize: 11, color: "#334466", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: t.textSecondary, marginTop: 2, transition: "color 0.5s ease" }}>
               {isPublic ? "Otros verán tu sueño" : "Solo tú verás esto"}
             </div>
           </div>
         </div>
         <div style={{
           width: 38, height: 22, borderRadius: 11, position: "relative",
-          background: isPublic ? "linear-gradient(135deg, #0066ff, #0099ff)" : "rgba(0,68,170,0.12)",
-          border: "1.5px solid rgba(0,100,255,0.25)", transition: "background 0.2s ease"
+          background: isPublic ? t.accentGradient : t.toggleOffBg,
+          border: `1.5px solid ${t.mutedBorder}`, transition: "background 0.3s ease"
         }}>
           <div style={{
             width: 16, height: 16, borderRadius: "50%", background: "white",
@@ -455,7 +573,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
       {/* Foto del usuario */}
       <div className="glass-card" style={{ margin: "0 16px 16px", padding: "16px" }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", textTransform: "uppercase", marginBottom: 12, fontWeight: 600 }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: t.label, textTransform: "uppercase", marginBottom: 12, fontWeight: 600, transition: "color 0.5s ease" }}>
           ¿Quieres aparecer en tu sueño?
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -465,14 +583,14 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
               alt="Tu rostro"
               style={{
                 width: 56, height: 56, borderRadius: "50%", objectFit: "cover",
-                border: "1.5px solid rgba(0,100,255,0.4)", flexShrink: 0
+                border: `1.5px solid ${t.cardBorder}`, flexShrink: 0
               }}
             />
           ) : (
             <div style={{
               width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
-              background: "rgba(0,100,255,0.08)", border: "1.5px solid rgba(0,100,255,0.25)",
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22
+              background: t.iconBg, border: `1.5px solid ${t.iconBorder}`,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, transition: "all 0.5s ease"
             }}>📷</div>
           )}
 
@@ -482,11 +600,11 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
                 onClick={() => setIncludeFace(!includeFace)}
                 style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", marginBottom: 10 }}
               >
-                <span style={{ fontSize: 12, fontWeight: 500, color: "#001a4d" }}>Aparecer en mi sueño</span>
+                <span style={{ fontSize: 12, fontWeight: 500, color: t.textPrimary, transition: "color 0.5s ease" }}>Aparecer en mi sueño</span>
                 <div style={{
                   width: 38, height: 22, borderRadius: 11, position: "relative", flexShrink: 0,
-                  background: includeFace ? "linear-gradient(135deg, #0066ff, #0099ff)" : "rgba(0,68,170,0.12)",
-                  border: "1.5px solid rgba(0,100,255,0.25)", transition: "background 0.2s ease"
+                  background: includeFace ? t.accentGradient : t.toggleOffBg,
+                  border: `1.5px solid ${t.mutedBorder}`, transition: "background 0.3s ease"
                 }}>
                   <div style={{
                     width: 16, height: 16, borderRadius: "50%", background: "white",
@@ -519,7 +637,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         />
 
         {faceError && (
-          <div style={{ marginTop: 10, fontSize: 11, color: "#cc3333" }}>{faceError}</div>
+          <div style={{ marginTop: 10, fontSize: 11, color: t.errorText, transition: "color 0.5s ease" }}>{faceError}</div>
         )}
       </div>
 
@@ -537,13 +655,14 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           className={dreamText.trim() && canGenerate ? "btn-primary" : ""}
           style={{
             margin: "0 16px 18px", padding: 16, borderRadius: 12, cursor: "pointer",
-            background: dreamText.trim() && canGenerate ? undefined : "rgba(0,68,170,0.08)",
+            background: dreamText.trim() && canGenerate ? undefined : t.mutedBg,
             display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-            opacity: dreamText.trim() && canGenerate ? 1 : 0.5
+            opacity: dreamText.trim() && canGenerate ? 1 : 0.5,
+            transition: "all 0.5s ease"
           }}
         >
-          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "white" : "#0066ff" }}>✦</span>
-          <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "white" : "#0066ff" }}>Materializar sueño</span>
+          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "white" : t.label }}>✦</span>
+          <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "white" : t.label }}>Materializar sueño</span>
         </div>
       )}
     </div>
@@ -551,7 +670,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 }
 
 // ============ GENERATING SCREEN ============
-function GeneratingScreen() {
+function GeneratingScreen({ isDarkMode }) {
+  const t = getTheme(isDarkMode);
   const [progress, setProgress] = useState(0);
   const [messageIdx, setMessageIdx] = useState(0);
 
@@ -596,8 +716,8 @@ function GeneratingScreen() {
           width: star.size,
           height: star.size,
           borderRadius: "50%",
-          background: "#0066ff",
-          boxShadow: `0 0 ${star.size * 3}px rgba(0,100,255,0.6)`,
+          background: t.starColor,
+          boxShadow: `0 0 ${star.size * 3}px ${t.starGlow}`,
           animation: `starFloat ${star.duration}s ease-in-out ${star.delay}s infinite alternate`,
           pointerEvents: "none"
         }} />
@@ -605,54 +725,55 @@ function GeneratingScreen() {
 
       <div style={{
         width: 160, height: 160, borderRadius: "50%", marginBottom: 40, position: "relative",
-        background: "radial-gradient(circle, rgba(0,100,255,0.35), rgba(0,150,255,0.18), transparent)",
-        boxShadow: "0 0 80px rgba(0,100,255,0.25), 0 0 120px rgba(0,150,255,0.12)",
+        background: t.orbGradient,
+        boxShadow: t.orbShadow,
         animation: "orbPulse 3s ease-in-out infinite",
         display: "flex", alignItems: "center", justifyContent: "center"
       }}>
         <div style={{
           position: "absolute", inset: 12, borderRadius: "50%",
-          border: "1.5px solid rgba(0,100,255,0.25)",
+          border: `1.5px solid ${t.ringColor1}`,
           animation: "orbRotate 8s linear infinite"
         }} />
         <div style={{
           position: "absolute", inset: 30, borderRadius: "50%",
-          border: "1.5px solid rgba(0,100,255,0.15)",
+          border: `1.5px solid ${t.ringColor2}`,
           animation: "orbRotate 12s linear infinite reverse"
         }} />
         <span style={{ fontSize: 40, position: "relative", zIndex: 2 }}>✦</span>
       </div>
 
       <div style={{
-        fontFamily: "Georgia, serif", fontSize: 18, color: "#0044aa",
-        marginBottom: 14, letterSpacing: "0.06em"
+        fontFamily: "Georgia, serif", fontSize: 18, color: t.label,
+        marginBottom: 14, letterSpacing: "0.06em", transition: "color 0.5s ease"
       }}>
         Generando tu sueño...
       </div>
 
       <div style={{
         fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic",
-        color: "#001a4d", marginBottom: 36, lineHeight: 1.5,
+        color: t.textPrimary, marginBottom: 36, lineHeight: 1.5,
         minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "0 16px"
+        padding: "0 16px", transition: "color 0.5s ease"
       }}>
         {GENERATING_MESSAGES[messageIdx]}
       </div>
 
-      <div style={{ width: "100%", maxWidth: 280, height: 3, borderRadius: 2, background: "rgba(0,100,255,0.1)", overflow: "hidden", marginBottom: 10 }}>
+      <div style={{ width: "100%", maxWidth: 280, height: 3, borderRadius: 2, background: t.progressTrackBg, overflow: "hidden", marginBottom: 10 }}>
         <div style={{
           height: "100%", borderRadius: 2, transition: "width 0.5s ease",
           width: `${progress}%`,
-          background: "linear-gradient(90deg, #0066ff, #0099ff)"
+          background: t.accentGradient
         }} />
       </div>
-      <div style={{ fontSize: 12, color: "#334466" }}>{Math.round(progress)}%</div>
+      <div style={{ fontSize: 12, color: t.textSecondary, transition: "color 0.5s ease" }}>{Math.round(progress)}%</div>
     </div>
   );
 }
 
 // ============ RESULT SCREEN ============
-function ResultScreen({ dream, user, onBack }) {
+function ResultScreen({ dream, user, onBack, isDarkMode }) {
+  const t = getTheme(isDarkMode);
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");
   const [dreamComments, setDreamComments] = useState(dream.comments || []);
@@ -692,8 +813,8 @@ function ResultScreen({ dream, user, onBack }) {
   return (
     <div style={{ padding: "0 0 20px" }}>
       <div onClick={onBack} style={{ padding: "16px 24px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-        <span style={{ fontSize: 18, color: "#0066ff" }}>←</span>
-        <span style={{ fontSize: 13, color: "#0066ff" }}>Volver</span>
+        <span style={{ fontSize: 18, color: t.label, transition: "color 0.5s ease" }}>←</span>
+        <span style={{ fontSize: 13, color: t.label, transition: "color 0.5s ease" }}>Volver</span>
       </div>
 
       <div className="glass-card" style={{ margin: "0 16px 20px", overflow: "hidden", position: "relative", aspectRatio: "9/16", background: "#000" }}>
@@ -713,17 +834,17 @@ function ResultScreen({ dream, user, onBack }) {
       </div>
 
       <div style={{ padding: "0 24px", marginBottom: 20 }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontStyle: "italic", color: "#001a4d", lineHeight: 1.4, marginBottom: 10 }}>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontStyle: "italic", color: t.textPrimary, lineHeight: 1.4, marginBottom: 10, transition: "color 0.5s ease" }}>
           "{dream.text}"
         </div>
-        <div style={{ fontSize: 11, color: "#334466" }}>{dream.createdAt} · 8s</div>
+        <div style={{ fontSize: 11, color: t.textSecondary, transition: "color 0.5s ease" }}>{dream.createdAt} · 8s</div>
       </div>
 
       {/* Download / WhatsApp / Copy */}
       <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 12 }}>
         <button className="glass-card" onClick={handleDownload} style={{
           flex: 1, padding: "12px 4px",
-          color: "#001a4d", fontSize: 12, cursor: "pointer", fontFamily: "inherit", border: "none"
+          color: t.textPrimary, fontSize: 12, cursor: "pointer", fontFamily: "inherit", border: "none"
         }}>⬇ Descargar</button>
         <button className="glass-card" onClick={handleWhatsApp} style={{
           flex: 1, padding: "12px 4px",
@@ -731,14 +852,14 @@ function ResultScreen({ dream, user, onBack }) {
         }}>💚 WhatsApp</button>
         <button className="glass-card" onClick={handleCopyLink} style={{
           flex: 1, padding: "12px 4px",
-          color: copied ? "#118844" : "#0066ff", fontSize: 12, cursor: "pointer", fontFamily: "inherit", border: "none"
+          color: copied ? "#118844" : t.label, fontSize: 12, cursor: "pointer", fontFamily: "inherit", border: "none"
         }}>{copied ? "✓ Copiado" : "🔗 Copiar"}</button>
       </div>
 
       {/* Interpretation */}
       <div className="glass-card" style={{ margin: "0 16px 16px", padding: 18 }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", marginBottom: 10, textTransform: "uppercase", fontWeight: 600 }}>INTERPRETACIÓN</div>
-        <div style={{ fontSize: 14, color: "#334466", lineHeight: 1.6, fontWeight: 300 }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: t.label, marginBottom: 10, textTransform: "uppercase", fontWeight: 600, transition: "color 0.5s ease" }}>INTERPRETACIÓN</div>
+        <div style={{ fontSize: 14, color: t.textSecondary, lineHeight: 1.6, fontWeight: 300, transition: "color 0.5s ease" }}>
           {GENERIC_INTERPRETATION}
         </div>
       </div>
@@ -746,7 +867,7 @@ function ResultScreen({ dream, user, onBack }) {
       {/* Comments */}
       <div style={{ display: "flex", padding: "0 16px", marginBottom: 16 }}>
         <button className="glass-card" onClick={() => setShowComments(!showComments)} style={{
-          flex: 1, padding: 12, color: "#001a4d",
+          flex: 1, padding: 12, color: t.textPrimary,
           fontSize: 13, cursor: "pointer", fontFamily: "inherit", border: "none"
         }}>💬 {dreamComments.length} comentarios</button>
       </div>
@@ -755,14 +876,14 @@ function ResultScreen({ dream, user, onBack }) {
         <div style={{ padding: "0 16px", marginBottom: 16 }}>
           <div style={{ marginBottom: 16 }}>
             {dreamComments.length === 0 ? (
-              <div style={{ fontSize: 12, color: "#334466", textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: 12, color: t.textSecondary, textAlign: "center", padding: "20px 0" }}>
                 Sé el primero en comentar
               </div>
             ) : (
               dreamComments.map(c => (
                 <div key={c.id} className="glass-card" style={{ marginBottom: 12, padding: "12px" }}>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: "#001a4d" }}>{c.author}</div>
-                  <div style={{ fontSize: 12, color: "#334466", marginTop: 4 }}>{c.text}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: t.textPrimary }}>{c.author}</div>
+                  <div style={{ fontSize: 12, color: t.textSecondary, marginTop: 4 }}>{c.text}</div>
                 </div>
               ))
             )}
@@ -791,7 +912,8 @@ function ResultScreen({ dream, user, onBack }) {
 }
 
 // ============ DIARIO SCREEN ============
-function DiarioScreen({ dreams }) {
+function DiarioScreen({ dreams, isDarkMode }) {
+  const t = getTheme(isDarkMode);
   const [filter, setFilter] = useState("all");
 
   const filteredDreams = useMemo(() => {
@@ -809,10 +931,10 @@ function DiarioScreen({ dreams }) {
   return (
     <div style={{ padding: "20px 0" }}>
       <div style={{ padding: "0 24px 20px" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#001a4d", letterSpacing: "-0.02em", marginBottom: 8 }}>
-          Tu <em style={{ fontStyle: "italic", background: "linear-gradient(135deg, #0066ff, #0099ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>diario</em>.
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: t.textPrimary, letterSpacing: "-0.02em", marginBottom: 8, transition: "color 0.5s ease" }}>
+          Tu <em style={{ fontStyle: "italic", background: t.accentGradient, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>diario</em>.
         </div>
-        <div style={{ fontSize: 13, color: "#334466" }}>
+        <div style={{ fontSize: 13, color: t.textSecondary, transition: "color 0.5s ease" }}>
           {stats.total} sueño{stats.total !== 1 ? "s" : ""} materializados
         </div>
       </div>
@@ -826,10 +948,10 @@ function DiarioScreen({ dreams }) {
           <div key={i} className="glass-card" style={{ padding: "14px 0", textAlign: "center" }}>
             <div style={{
               fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 300,
-              background: "linear-gradient(135deg, #0066ff, #0099ff)",
+              background: t.accentGradient,
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
             }}>{item.num}</div>
-            <div style={{ fontSize: 10, color: "#334466", marginTop: 4 }}>{item.label}</div>
+            <div style={{ fontSize: 10, color: t.textSecondary, marginTop: 4, transition: "color 0.5s ease" }}>{item.label}</div>
           </div>
         ))}
       </div>
@@ -837,10 +959,10 @@ function DiarioScreen({ dreams }) {
       <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 16 }}>
         {["all", "public", "private"].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
-            flex: 1, padding: "10px", borderRadius: 10, border: "1.5px solid rgba(0,100,255,0.25)",
-            background: filter === f ? "rgba(0,100,255,0.1)" : "rgba(255,255,255,0.9)",
-            color: filter === f ? "#0066ff" : "#334466",
-            fontSize: 12, cursor: "pointer", transition: "all 0.2s ease", fontWeight: 500, fontFamily: "inherit"
+            flex: 1, padding: "10px", borderRadius: 10, border: `1.5px solid ${t.mutedBorder}`,
+            background: filter === f ? t.mutedBg : t.cardBg,
+            color: filter === f ? t.label : t.textSecondary,
+            fontSize: 12, cursor: "pointer", transition: "all 0.5s ease", fontWeight: 500, fontFamily: "inherit"
           }}>
             {f === "all" ? "Todos" : f === "public" ? "Públicos" : "Privados"}
           </button>
@@ -849,23 +971,23 @@ function DiarioScreen({ dreams }) {
 
       <div style={{ padding: "0 16px" }}>
         {filteredDreams.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 20px", color: "#334466", fontSize: 14 }}>
+          <div style={{ textAlign: "center", padding: "40px 20px", color: t.textSecondary, fontSize: 14 }}>
             No hay sueños aquí
           </div>
         ) : (
           filteredDreams.map(d => (
             <div key={d.id} style={{
               display: "flex", gap: 12, padding: "14px 0",
-              borderBottom: "1.5px solid rgba(0,100,255,0.1)",
+              borderBottom: `1.5px solid ${t.mutedBorder}`,
             }}>
               <div className="glass-card" style={{ width: 56, height: 56, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
                 🌙
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: "Georgia, serif", fontSize: 14, fontStyle: "italic", color: "#001a4d", lineHeight: 1.3, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div style={{ fontFamily: "Georgia, serif", fontSize: 14, fontStyle: "italic", color: t.textPrimary, lineHeight: 1.3, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.5s ease" }}>
                   "{d.text}"
                 </div>
-                <div style={{ fontSize: 11, color: "#334466", display: "flex", gap: 8, alignItems: "center" }}>
+                <div style={{ fontSize: 11, color: t.textSecondary, display: "flex", gap: 8, alignItems: "center", transition: "color 0.5s ease" }}>
                   <span>{d.createdAt}</span>
                   <span>·</span>
                   <span>8s</span>
@@ -881,7 +1003,8 @@ function DiarioScreen({ dreams }) {
 }
 
 // ============ UNIVERSO SCREEN ============
-function UniversoScreen({ dreams, currentUserId }) {
+function UniversoScreen({ dreams, currentUserId, isDarkMode }) {
+  const t = getTheme(isDarkMode);
   const publicDreams = useMemo(() => dreams.filter(d => d.isPublic), [dreams]);
   const [likedDreams, setLikedDreams] = useLocalStorage("likedDreams", {});
 
@@ -892,16 +1015,16 @@ function UniversoScreen({ dreams, currentUserId }) {
   return (
     <div style={{ padding: "20px 0" }}>
       <div style={{ padding: "0 24px 20px" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: "#001a4d", letterSpacing: "-0.02em", marginBottom: 8 }}>
-          <em style={{ fontStyle: "italic", background: "linear-gradient(135deg, #0066ff, #0099ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Universo</em>.
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: t.textPrimary, letterSpacing: "-0.02em", marginBottom: 8, transition: "color 0.5s ease" }}>
+          <em style={{ fontStyle: "italic", background: t.accentGradient, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Universo</em>.
         </div>
-        <div style={{ fontSize: 13, color: "#334466" }}>
+        <div style={{ fontSize: 13, color: t.textSecondary, transition: "color 0.5s ease" }}>
           {publicDreams.length} sueño{publicDreams.length !== 1 ? "s" : ""} compartido{publicDreams.length !== 1 ? "s" : ""}
         </div>
       </div>
 
       {publicDreams.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "40px 20px", color: "#334466", fontSize: 14 }}>
+        <div style={{ textAlign: "center", padding: "40px 20px", color: t.textSecondary, fontSize: 14 }}>
           Aún no hay sueños públicos. ¡Sé el primero!
         </div>
       ) : (
@@ -912,18 +1035,18 @@ function UniversoScreen({ dreams, currentUserId }) {
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: "50%",
-                  background: "linear-gradient(135deg, #0066ff, #0099ff)",
+                  background: t.accentGradient,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 12, color: "white", fontWeight: 600
                 }}>U</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, color: "#001a4d", fontWeight: 500 }}>Usuario Dream</div>
-                  <div style={{ fontSize: 10, color: "#334466" }}>@user_dreams</div>
+                  <div style={{ fontSize: 13, color: t.textPrimary, fontWeight: 500, transition: "color 0.5s ease" }}>Usuario Dream</div>
+                  <div style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>@user_dreams</div>
                 </div>
                 <button style={{
                   fontSize: 11, padding: "4px 8px", borderRadius: 6,
-                  background: "rgba(0,100,255,0.08)", border: "1.5px solid rgba(0,100,255,0.25)",
-                  color: "#0066ff", cursor: "pointer", fontFamily: "inherit"
+                  background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
+                  color: t.label, cursor: "pointer", fontFamily: "inherit", transition: "all 0.5s ease"
                 }}>+ Seguir</button>
               </div>
 
@@ -938,21 +1061,21 @@ function UniversoScreen({ dreams, currentUserId }) {
 
               <div style={{
                 fontFamily: "Georgia, serif", fontSize: 15, fontStyle: "italic",
-                color: "#001a4d", lineHeight: 1.4, marginBottom: 12
+                color: t.textPrimary, lineHeight: 1.4, marginBottom: 12, transition: "color 0.5s ease"
               }}>
                 "{d.text}"
               </div>
 
               <div style={{ display: "flex", gap: 16, alignItems: "center", fontSize: 13 }}>
-                <div onClick={() => toggleLike(d.id)} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", color: liked ? "#ff4477" : "#334466" }}>
+                <div onClick={() => toggleLike(d.id)} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", color: liked ? "#ff4477" : t.textSecondary, transition: "color 0.5s ease" }}>
                   <span>{liked ? "♥" : "♡"}</span>
                   <span>{liked ? (d.likes + 1) : d.likes}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#334466" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, color: t.textSecondary, transition: "color 0.5s ease" }}>
                   <span>💬</span>
                   <span>{d.comments?.length || 0}</span>
                 </div>
-                <div style={{ marginLeft: "auto", color: "#334466", cursor: "pointer" }}>⋯</div>
+                <div style={{ marginLeft: "auto", color: t.textSecondary, cursor: "pointer", transition: "color 0.5s ease" }}>⋯</div>
               </div>
             </div>
           );
@@ -963,7 +1086,8 @@ function UniversoScreen({ dreams, currentUserId }) {
 }
 
 // ============ PROFILE SCREEN ============
-function ProfileScreen({ user, onUpgrade }) {
+function ProfileScreen({ user, onUpgrade, isDarkMode }) {
+  const t = getTheme(isDarkMode);
   const { signOut } = useClerk();
   const [infoMessage, setInfoMessage] = useState("");
 
@@ -993,34 +1117,34 @@ function ProfileScreen({ user, onUpgrade }) {
             alt={user.name}
             style={{
               width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px", display: "block",
-              objectFit: "cover", border: "2px solid rgba(0,100,255,0.4)",
-              boxShadow: "0 12px 36px rgba(0,100,255,0.2)"
+              objectFit: "cover", border: `2px solid ${t.cardBorder}`,
+              boxShadow: `0 12px 36px ${t.cardBorder}`
             }}
           />
         ) : (
           <div style={{
             width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px",
-            background: "linear-gradient(135deg, #0066ff, #0099ff)",
+            background: t.accentGradient,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 36, color: "white", fontWeight: 300, fontFamily: "Georgia, serif",
-            boxShadow: "0 12px 36px rgba(0,100,255,0.2)"
+            boxShadow: `0 12px 36px ${t.cardBorder}`
           }}>{user.name.charAt(0).toUpperCase()}</div>
         )}
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 300, color: "#001a4d", marginBottom: 4 }}>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 300, color: t.textPrimary, marginBottom: 4, transition: "color 0.5s ease" }}>
           {user.name}
         </div>
-        <div style={{ fontSize: 12, color: "#334466", marginBottom: 4 }}>
+        <div style={{ fontSize: 12, color: t.textSecondary, marginBottom: 4, transition: "color 0.5s ease" }}>
           {user.email}
         </div>
       </div>
 
       {/* Plan card */}
       <div className="glass-card" style={{ margin: "0 16px 16px", padding: 24 }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: "#0066ff", marginBottom: 8, textTransform: "uppercase", fontWeight: 600 }}>TU PLAN</div>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#001a4d", marginBottom: 6, textTransform: "capitalize" }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: t.label, marginBottom: 8, textTransform: "uppercase", fontWeight: 600, transition: "color 0.5s ease" }}>TU PLAN</div>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: t.textPrimary, marginBottom: 6, textTransform: "capitalize", transition: "color 0.5s ease" }}>
           {user.plan === "free" ? "Explorador" : user.plan === "soñador" ? "Soñador" : "Visionario"}
         </div>
-        <div style={{ fontSize: 12, color: "#334466", marginBottom: 16, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 12, color: t.textSecondary, marginBottom: 16, lineHeight: 1.5, transition: "color 0.5s ease" }}>
           {user.plan === "free"
             ? "1 video de prueba de 8s · Sin face swap"
             : user.plan === "soñador"
@@ -1045,7 +1169,7 @@ function ProfileScreen({ user, onUpgrade }) {
           className="glass-card"
           style={{
             margin: "0 16px 16px", padding: "14px 16px", cursor: "pointer",
-            fontSize: 13, color: "#001a4d", lineHeight: 1.5
+            fontSize: 13, color: t.textPrimary, lineHeight: 1.5
           }}
         >
           {infoMessage}
@@ -1060,29 +1184,29 @@ function ProfileScreen({ user, onUpgrade }) {
             onClick={() => handleItemClick(item.label)}
             style={{
               display: "flex", alignItems: "center", gap: 12, padding: "14px 8px",
-              borderBottom: "1.5px solid rgba(0,100,255,0.1)", cursor: "pointer", transition: "all 0.2s ease"
+              borderBottom: `1.5px solid ${t.mutedBorder}`, cursor: "pointer", transition: "all 0.5s ease"
             }}
           >
             <div style={{
               width: 40, height: 40, borderRadius: 12,
-              background: "rgba(0,100,255,0.06)", border: "1.5px solid rgba(0,100,255,0.15)",
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18
+              background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, transition: "all 0.5s ease"
             }}>{item.icon}</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 14, color: "#001a4d", fontWeight: 500 }}>{item.label}</span>
+                <span style={{ fontSize: 14, color: t.textPrimary, fontWeight: 500, transition: "color 0.5s ease" }}>{item.label}</span>
                 {item.badge && (
                   <span style={{
                     fontSize: 9, padding: "2px 6px", borderRadius: 6,
-                    background: "rgba(0,100,255,0.1)", border: "1.5px solid rgba(0,100,255,0.25)",
-                    color: "#0066ff", fontWeight: 600, letterSpacing: "0.05em",
-                    textTransform: "uppercase"
+                    background: t.pillBg, border: `1.5px solid ${t.pillBorder}`,
+                    color: t.label, fontWeight: 600, letterSpacing: "0.05em",
+                    textTransform: "uppercase", transition: "all 0.5s ease"
                   }}>Próximamente</span>
                 )}
               </div>
-              <div style={{ fontSize: 11, color: "#334466" }}>{item.desc}</div>
+              <div style={{ fontSize: 11, color: t.textSecondary, transition: "color 0.5s ease" }}>{item.desc}</div>
             </div>
-            <span style={{ fontSize: 18, color: "#0066ff" }}>›</span>
+            <span style={{ fontSize: 18, color: t.label, transition: "color 0.5s ease" }}>›</span>
           </div>
         ))}
       </div>
@@ -1101,7 +1225,7 @@ function ProfileScreen({ user, onUpgrade }) {
         </button>
       </div>
 
-      <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: "#7799cc" }}>
+      <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: t.inactiveTab, transition: "color 0.5s ease" }}>
         Astra · v1.3.0<br />Hecho con magia ✨ en México
       </div>
     </div>
@@ -1109,24 +1233,26 @@ function ProfileScreen({ user, onUpgrade }) {
 }
 
 // ============ LOGIN SCREEN ============
-function LoginScreen() {
+function LoginScreen({ isDarkMode }) {
+  const t = getTheme(isDarkMode);
   return (
     <div style={{
       minHeight: "100vh", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", padding: "40px 24px",
-      background: "#f0f5ff", position: "relative", overflow: "hidden"
+      background: t.bg, position: "relative", overflow: "hidden", transition: "background 0.5s ease"
     }}>
-      <GlobalStyles />
+      <GlobalStyles isDarkMode={isDarkMode} />
+      {isDarkMode && <NightStars />}
       <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: 380, textAlign: "center" }}>
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>✦</div>
           <div style={{
             fontFamily: "Georgia, serif", fontSize: 36, fontWeight: 300,
-            background: "linear-gradient(135deg, #0066ff, #0099ff)",
+            background: t.accentGradient,
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             marginBottom: 8
           }}>Astra</div>
-          <div style={{ fontSize: 14, color: "#0044aa", fontStyle: "italic" }}>
+          <div style={{ fontSize: 14, color: t.label, fontStyle: "italic", transition: "color 0.5s ease" }}>
             Materializa tus sueños con IA
           </div>
         </div>
@@ -1134,28 +1260,28 @@ function LoginScreen() {
           <SignIn
             appearance={{
               variables: {
-                colorPrimary: "#0066ff",
-                colorBackground: "#ffffff",
-                colorText: "#001a4d",
-                colorTextSecondary: "#334466",
-                colorInputBackground: "rgba(0,100,255,0.04)",
-                colorInputText: "#001a4d",
+                colorPrimary: t.accentSolid,
+                colorBackground: isDarkMode ? "#0d0d1a" : "#ffffff",
+                colorText: t.textPrimary,
+                colorTextSecondary: t.textSecondary,
+                colorInputBackground: t.inputBg,
+                colorInputText: t.textPrimary,
                 borderRadius: "12px",
                 fontFamily: "Inter, sans-serif",
               },
               elements: {
                 card: { background: "transparent", boxShadow: "none" },
-                headerTitle: { color: "#001a4d" },
-                headerSubtitle: { color: "#334466" },
+                headerTitle: { color: t.textPrimary },
+                headerSubtitle: { color: t.textSecondary },
                 socialButtonsBlockButton: {
-                  background: "rgba(0,100,255,0.06)",
-                  border: "1.5px solid rgba(0,100,255,0.2)",
-                  color: "#001a4d",
+                  background: t.mutedBg,
+                  border: `1.5px solid ${t.mutedBorder}`,
+                  color: t.textPrimary,
                 },
-                dividerLine: { background: "rgba(0,100,255,0.15)" },
-                dividerText: { color: "#7799cc" },
-                formButtonPrimary: { background: "linear-gradient(135deg, #0066ff, #0099ff)", border: "none" },
-                footerActionLink: { color: "#0066ff" },
+                dividerLine: { background: t.mutedBorder },
+                dividerText: { color: t.inactiveTab },
+                formButtonPrimary: { background: t.accentGradient, border: "none" },
+                footerActionLink: { color: t.label },
               }
             }}
           />
@@ -1169,6 +1295,8 @@ function LoginScreen() {
 export default function Astra() {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const [tab, setTab] = useState("sonar");
+  const isDarkMode = useIsNight();
+  const t = getTheme(isDarkMode);
 
   const [credits, setCredits] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
@@ -1235,15 +1363,15 @@ export default function Astra() {
 
   if (!isLoaded) {
     return (
-      <div style={{ minHeight: "100vh", background: "#f0f5ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <GlobalStyles />
-        <div style={{ color: "#0044aa", fontStyle: "italic" }}>Cargando...</div>
+      <div style={{ minHeight: "100vh", background: t.bg, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.5s ease" }}>
+        <GlobalStyles isDarkMode={isDarkMode} />
+        <div style={{ color: t.label, fontStyle: "italic", transition: "color 0.5s ease" }}>Cargando...</div>
       </div>
     );
   }
 
   if (!isSignedIn) {
-    return <LoginScreen />;
+    return <LoginScreen isDarkMode={isDarkMode} />;
   }
 
   const tabs = [
@@ -1256,10 +1384,12 @@ export default function Astra() {
   return (
     <div style={{
       width: "100%", maxWidth: 430, margin: "0 auto",
-      minHeight: "100vh", background: "#f0f5ff",
-      position: "relative", overflow: "hidden", fontFamily: "'Inter', sans-serif"
+      minHeight: "100vh", background: t.bg,
+      position: "relative", overflow: "hidden", fontFamily: "'Inter', sans-serif",
+      transition: "all 0.5s ease"
     }}>
-      <GlobalStyles />
+      <GlobalStyles isDarkMode={isDarkMode} />
+      {isDarkMode && <NightStars />}
 
       <div style={{ position: "relative", zIndex: 2, paddingBottom: 100, minHeight: "100vh" }}>
         {tab === "sonar" && (
@@ -1270,11 +1400,12 @@ export default function Astra() {
             subscriptionStatus={subscriptionStatus}
             onSubscribe={handleSubscribe}
             subscriptionMessage={subscriptionMessage}
+            isDarkMode={isDarkMode}
           />
         )}
-        {tab === "diario" && <DiarioScreen dreams={dreams} />}
-        {tab === "universo" && <UniversoScreen dreams={dreams} currentUserId={fullUser.id} />}
-        {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} />}
+        {tab === "diario" && <DiarioScreen dreams={dreams} isDarkMode={isDarkMode} />}
+        {tab === "universo" && <UniversoScreen dreams={dreams} currentUserId={fullUser.id} isDarkMode={isDarkMode} />}
+        {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} isDarkMode={isDarkMode} />}
       </div>
 
       <div className="navbar-glass" style={{
@@ -1284,10 +1415,10 @@ export default function Astra() {
         padding: "12px 0 28px",
         zIndex: 100
       }}>
-        {tabs.map(t => (
+        {tabs.map(tb => (
           <div
-            key={t.id}
-            onClick={() => setTab(t.id)}
+            key={tb.id}
+            onClick={() => setTab(tb.id)}
             style={{
               display: "flex", flexDirection: "column", alignItems: "center",
               gap: 4, padding: "6px 16px", cursor: "pointer",
@@ -1296,17 +1427,17 @@ export default function Astra() {
           >
             <span style={{
               fontSize: 24,
-              opacity: tab === t.id ? 1 : 0.4,
-              filter: tab === t.id ? "none" : "grayscale(0.6)",
+              opacity: tab === tb.id ? 1 : 0.4,
+              filter: tab === tb.id ? "none" : "grayscale(0.6)",
               transition: "all 0.2s ease"
-            }}>{t.icon}</span>
+            }}>{tb.icon}</span>
             <span style={{
               fontSize: 9, fontWeight: 600,
               letterSpacing: "0.06em",
-              color: tab === t.id ? "#0066ff" : "#7799cc",
-              transition: "color 0.2s ease",
+              color: tab === tb.id ? t.label : t.inactiveTab,
+              transition: "color 0.5s ease",
               textTransform: "uppercase"
-            }}>{t.label}</span>
+            }}>{tb.label}</span>
           </div>
         ))}
       </div>
