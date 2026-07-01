@@ -92,34 +92,34 @@ const useIsNight = () => {
 // ============ THEME ============
 function getTheme(isDarkMode) {
   return isDarkMode ? {
-    bg: "#080612",
-    textPrimary: "#f0f0ff",
-    textSecondary: "rgba(255,255,255,0.45)",
-    label: "#c084fc",
-    accentGradient: "linear-gradient(135deg, #7c3aed, #a855f7)",
-    accentSolid: "#a855f7",
-    cardBg: "rgba(255,255,255,0.04)",
-    cardBorder: "rgba(168,85,247,0.25)",
-    cardShadow: "0 0 0 1px rgba(168,85,247,0.15), 0 4px 24px rgba(139,92,246,0.1)",
-    cardHoverShadow: "0 0 0 1px rgba(168,85,247,0.4), 0 8px 32px rgba(139,92,246,0.2)",
-    inputBg: "rgba(255,255,255,0.04)",
-    inputBorder: "rgba(168,85,247,0.25)",
-    inputFocusBorder: "rgba(168,85,247,0.6)",
-    inputFocusShadow: "0 0 0 3px rgba(168,85,247,0.15)",
-    placeholder: "rgba(200,180,255,0.3)",
-    btnGradient: "linear-gradient(135deg, #7c3aed, #a855f7)",
-    btnShadow: "0 4px 16px rgba(139,92,246,0.4)",
-    btnHoverShadow: "0 6px 20px rgba(139,92,246,0.5)",
-    navbarBg: "rgba(8,6,18,0.9)",
-    navbarBorder: "rgba(168,85,247,0.15)",
-    pillBg: "rgba(168,85,247,0.1)",
-    pillBorder: "rgba(168,85,247,0.3)",
-    pillText: "#c084fc",
-    mutedBg: "rgba(168,85,247,0.08)",
-    mutedBorder: "rgba(168,85,247,0.15)",
-    iconBg: "rgba(168,85,247,0.1)",
-    iconBorder: "rgba(168,85,247,0.25)",
-    toggleOffBg: "rgba(168,85,247,0.12)",
+    bg: "#000000",
+    textPrimary: "#ffffff",
+    textSecondary: "rgba(255,255,255,0.4)",
+    label: "#00ccff",
+    accentGradient: "linear-gradient(135deg, #0044cc, #00aaff)",
+    accentSolid: "#00ccff",
+    cardBg: "rgba(0,20,60,0.7)",
+    cardBorder: "rgba(0,180,255,0.25)",
+    cardShadow: "0 0 0 1px rgba(0,180,255,0.25), 0 4px 24px rgba(0,150,255,0.1)",
+    cardHoverShadow: "0 0 0 1px rgba(0,180,255,0.5), 0 8px 32px rgba(0,150,255,0.2)",
+    inputBg: "rgba(0,20,60,0.7)",
+    inputBorder: "rgba(0,180,255,0.25)",
+    inputFocusBorder: "rgba(0,180,255,0.6)",
+    inputFocusShadow: "0 0 0 3px rgba(0,180,255,0.15)",
+    placeholder: "rgba(180,220,255,0.3)",
+    btnGradient: "linear-gradient(135deg, #0044cc, #00aaff)",
+    btnShadow: "0 4px 20px rgba(0,150,255,0.5)",
+    btnHoverShadow: "0 6px 24px rgba(0,150,255,0.6)",
+    navbarBg: "rgba(0,0,0,0.85)",
+    navbarBorder: "rgba(0,180,255,0.15)",
+    pillBg: "rgba(0,150,255,0.12)",
+    pillBorder: "rgba(0,200,255,0.4)",
+    pillText: "#00ccff",
+    mutedBg: "rgba(0,180,255,0.08)",
+    mutedBorder: "rgba(0,180,255,0.15)",
+    iconBg: "rgba(0,180,255,0.1)",
+    iconBorder: "rgba(0,180,255,0.25)",
+    toggleOffBg: "rgba(0,180,255,0.12)",
     errorBg: "rgba(255,80,80,0.1)",
     errorBorder: "rgba(255,80,80,0.35)",
     errorText: "#ff8080",
@@ -127,13 +127,13 @@ function getTheme(isDarkMode) {
     successBg: "rgba(52,211,153,0.1)",
     successBorder: "rgba(52,211,153,0.4)",
     inactiveTab: "rgba(255,255,255,0.35)",
-    orbGradient: "radial-gradient(circle, rgba(139,92,246,0.35), rgba(168,85,247,0.18), transparent)",
-    orbShadow: "0 0 80px rgba(139,92,246,0.25), 0 0 120px rgba(168,85,247,0.12)",
-    ringColor1: "rgba(168,85,247,0.25)",
-    ringColor2: "rgba(168,85,247,0.15)",
-    starColor: "#a855f7",
-    starGlow: "rgba(139,92,246,0.6)",
-    progressTrackBg: "rgba(168,85,247,0.1)",
+    orbGradient: "radial-gradient(circle, rgba(0,150,255,0.35), rgba(0,180,255,0.18), transparent)",
+    orbShadow: "0 0 80px rgba(0,150,255,0.25), 0 0 120px rgba(0,180,255,0.12)",
+    ringColor1: "rgba(0,180,255,0.25)",
+    ringColor2: "rgba(0,180,255,0.15)",
+    starColor: "#00ccff",
+    starGlow: "rgba(0,180,255,0.6)",
+    progressTrackBg: "rgba(0,180,255,0.1)",
   } : {
     bg: "#f0f5ff",
     textPrimary: "#001a4d",
@@ -194,6 +194,27 @@ function GlobalStyles({ isDarkMode }) {
       @keyframes orbRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       @keyframes starFloat { from { transform: translateY(0) scale(1); opacity: 0.4; } to { transform: translateY(-14px) scale(1.5); opacity: 1; } }
 
+      @keyframes drift1 {
+        0% { background-position: 0 0, 20px 20px; }
+        100% { background-position: 40px 40px, 60px 60px; }
+      }
+      @keyframes drift2 {
+        0% { background-position: 0 0; }
+        100% { background-position: -60px 60px; }
+      }
+      @keyframes drift3 {
+        0% { background-position: 0 0; }
+        100% { background-position: 30px -30px; }
+      }
+      @keyframes twinkle {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+      @keyframes twinkle2 {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+
       .glass-card {
         background: ${t.cardBg};
         border: 1.5px solid transparent;
@@ -252,11 +273,42 @@ function GlobalStyles({ isDarkMode }) {
 
 function NightStars() {
   return (
-    <div style={{
-      position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-      backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)",
-      backgroundSize: "28px 28px"
-    }} />
+    <>
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
+        backgroundImage: "radial-gradient(circle, rgba(0,180,255,0.9) 1px, transparent 1px)",
+        backgroundSize: "42px 42px",
+        animation: "drift1 25s linear infinite"
+      }} />
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
+        backgroundImage: "radial-gradient(circle, rgba(0,240,255,0.7) 1px, transparent 1px)",
+        backgroundSize: "71px 71px",
+        backgroundPosition: "15px 15px",
+        animation: "drift2 35s linear infinite"
+      }} />
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
+        backgroundImage: "radial-gradient(circle, rgba(100,220,255,0.95) 1.5px, transparent 1.5px)",
+        backgroundSize: "110px 110px",
+        backgroundPosition: "35px 35px",
+        animation: "drift3 45s linear infinite"
+      }} />
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
+        backgroundImage: "radial-gradient(circle, rgba(0,200,255,1) 1px, transparent 1px)",
+        backgroundSize: "160px 160px",
+        backgroundPosition: "80px 80px",
+        animation: "twinkle 3s ease-in-out infinite"
+      }} />
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
+        backgroundImage: "radial-gradient(circle, rgba(150,230,255,0.9) 1px, transparent 1px)",
+        backgroundSize: "200px 200px",
+        backgroundPosition: "100px 50px",
+        animation: "twinkle2 4.5s ease-in-out infinite"
+      }} />
+    </>
   );
 }
 
