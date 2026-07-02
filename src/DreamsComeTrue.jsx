@@ -538,7 +538,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           value={dreamText}
           onChange={(e) => { setDreamText(e.target.value); setError(""); }}
           placeholder="Volaba sobre una ciudad de cristal bajo el océano..."
-          maxLength={500}
+          maxLength={5000}
           style={{
             width: "100%", minHeight: 80, padding: 10,
             fontFamily: "'Georgia', serif", fontSize: 16, fontStyle: "italic",
@@ -555,7 +555,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
             }}>🎤</div>
             <span style={{ fontSize: 11, color: t.textSecondary, transition: "color 0.5s ease" }}>o di tu sueño</span>
           </div>
-          <span style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>{dreamText.length}/500</span>
+          <span style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>{dreamText.length}/5000</span>
         </div>
       </div>
 
