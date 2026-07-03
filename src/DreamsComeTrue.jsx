@@ -336,6 +336,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
       startResp = await callAPI("/api/dreams/generate", "POST", {
         text: dreamText,
         userId: user.id,
+        isPublic,
         ...(includeFace && faceElementId ? { incluirCara: true, elementId: faceElementId } : {}),
       });
       if (startResp?._status === 402) {
@@ -991,14 +992,45 @@ function DiarioScreen({ dreams, isDarkMode }) {
 }
 
 // ============ UNIVERSO SCREEN ============
-function UniversoScreen({ dreams, currentUserId, isDarkMode }) {
+function UniversoScreen({ isDarkMode }) {
   const t = getTheme(isDarkMode);
-  const publicDreams = useMemo(() => dreams.filter(d => d.isPublic), [dreams]);
-  const [likedDreams, setLikedDreams] = useLocalStorage("likedDreams", {});
+  const LIMIT = 20;
+  const [communityDreams, setCommunityDreams] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState("");
 
-  const toggleLike = (id) => {
-    setLikedDreams(prev => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError("");
+    callAPI(`/api/dreams/community?limit=${LIMIT}&offset=0`).then(data => {
+      if (cancelled) return;
+      if (data?.error) {
+        setError("No se pudo cargar el Universo");
+      } else {
+        setCommunityDreams(data.dreams || []);
+        setTotal(data.total || 0);
+        setOffset((data.dreams || []).length);
+      }
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    const data = await callAPI(`/api/dreams/community?limit=${LIMIT}&offset=${offset}`);
+    if (!data?.error) {
+      setCommunityDreams(prev => [...prev, ...(data.dreams || [])]);
+      setOffset(prev => prev + (data.dreams || []).length);
+    }
+    setLoadingMore(false);
   };
+
+  const hasMore = communityDreams.length < total;
 
   return (
     <div style={{ padding: "20px 0" }}>
@@ -1007,17 +1039,24 @@ function UniversoScreen({ dreams, currentUserId, isDarkMode }) {
           <em style={{ fontStyle: "italic", background: t.accentGradient, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Universo</em>.
         </div>
         <div style={{ fontSize: 13, color: t.textSecondary, transition: "color 0.5s ease" }}>
-          {publicDreams.length} sueño{publicDreams.length !== 1 ? "s" : ""} compartido{publicDreams.length !== 1 ? "s" : ""}
+          {total} sueño{total !== 1 ? "s" : ""} compartido{total !== 1 ? "s" : ""}
         </div>
       </div>
 
-      {publicDreams.length === 0 ? (
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "40px 20px", color: t.textSecondary, fontSize: 14 }}>
+          Cargando...
+        </div>
+      ) : error ? (
+        <div style={{ textAlign: "center", padding: "40px 20px", color: t.errorText, fontSize: 14 }}>
+          {error}
+        </div>
+      ) : communityDreams.length === 0 ? (
         <div style={{ textAlign: "center", padding: "40px 20px", color: t.textSecondary, fontSize: 14 }}>
           Aún no hay sueños públicos. ¡Sé el primero!
         </div>
       ) : (
-        publicDreams.map(d => {
-          const liked = likedDreams[d.id];
+        communityDreams.map(d => {
           return (
             <div key={d.id} className="glass-card" style={{ margin: "0 16px 14px", padding: "16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
@@ -1025,49 +1064,58 @@ function UniversoScreen({ dreams, currentUserId, isDarkMode }) {
                   width: 36, height: 36, borderRadius: "50%",
                   background: t.accentGradient,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 12, color: "#000000", fontWeight: 600
-                }}>U</div>
+                  fontSize: 14, color: "#000000", fontWeight: 600
+                }}>✦</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, color: t.textPrimary, fontWeight: 500, transition: "color 0.5s ease" }}>Usuario Dream</div>
-                  <div style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>@user_dreams</div>
+                  <div style={{ fontSize: 13, color: t.textPrimary, fontWeight: 500, transition: "color 0.5s ease" }}>Soñador</div>
+                  <div style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>
+                    {d.created_at ? new Date(d.created_at).toLocaleDateString('es-ES') : ""}
+                  </div>
                 </div>
-                <button style={{
-                  fontSize: 11, padding: "4px 8px", borderRadius: 6,
-                  background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
-                  color: t.label, cursor: "pointer", fontFamily: "inherit", transition: "all 0.5s ease"
-                }}>+ Seguir</button>
+                {d.style && (
+                  <div style={{
+                    fontSize: 10, padding: "4px 10px", borderRadius: 20, textTransform: "capitalize",
+                    background: t.pillBg, border: `1.5px solid ${t.pillBorder}`, color: t.pillText
+                  }}>{d.style}</div>
+                )}
               </div>
 
               <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#000", aspectRatio: "16/9" }}>
                 <video
-                  src={d.videoUrl}
-                  controls
+                  src={d.video_url}
+                  autoPlay
+                  muted
+                  loop
                   playsInline
-                  style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", background: "#000" }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
               </div>
 
               <div style={{
                 fontFamily: "Georgia, serif", fontSize: 15, fontStyle: "italic",
-                color: t.textPrimary, lineHeight: 1.4, marginBottom: 12, transition: "color 0.5s ease"
+                color: t.textPrimary, lineHeight: 1.4, transition: "color 0.5s ease"
               }}>
                 "{d.text}"
-              </div>
-
-              <div style={{ display: "flex", gap: 16, alignItems: "center", fontSize: 13 }}>
-                <div onClick={() => toggleLike(d.id)} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", color: liked ? "#ff4477" : t.textSecondary, transition: "color 0.5s ease" }}>
-                  <span>{liked ? "♥" : "♡"}</span>
-                  <span>{liked ? (d.likes + 1) : d.likes}</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: t.textSecondary, transition: "color 0.5s ease" }}>
-                  <span>💬</span>
-                  <span>{d.comments?.length || 0}</span>
-                </div>
-                <div style={{ marginLeft: "auto", color: t.textSecondary, cursor: "pointer", transition: "color 0.5s ease" }}>⋯</div>
               </div>
             </div>
           );
         })
+      )}
+
+      {!loading && !error && hasMore && (
+        <div style={{ textAlign: "center", padding: "10px 20px 20px" }}>
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            style={{
+              background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`, color: t.label,
+              borderRadius: 20, padding: "10px 20px", fontSize: 13, fontFamily: "inherit",
+              cursor: loadingMore ? "default" : "pointer", opacity: loadingMore ? 0.6 : 1
+            }}
+          >
+            {loadingMore ? "Cargando..." : "Cargar más"}
+          </button>
+        </div>
       )}
     </div>
   );
@@ -1474,7 +1522,7 @@ export default function Astra() {
           />
         )}
         {tab === "diario" && <DiarioScreen dreams={dreams} isDarkMode={isDarkMode} />}
-        {tab === "universo" && <UniversoScreen dreams={dreams} currentUserId={fullUser.id} isDarkMode={isDarkMode} />}
+        {tab === "universo" && <UniversoScreen isDarkMode={isDarkMode} />}
         {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} isDarkMode={isDarkMode} />}
       </div>
 
