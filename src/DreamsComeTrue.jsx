@@ -267,7 +267,66 @@ function GlobalStyles({ isDarkMode }) {
         color: ${t.pillText};
         transition: all 0.5s ease;
       }
+
+      .dream-hero-video {
+        width: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+        display: block;
+      }
+      .dream-hero-video video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
     `}</style>
+  );
+}
+
+const DREAM_VIDEO_FILES = ["video 1.mp4", "video 2.mp4", "video 3.mp4", "video 4.mp4"];
+
+function DreamHero() {
+  const [index, setIndex] = useState(0);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+    video.play().catch(() => {});
+  }, [index]);
+
+  const handleEnded = () => {
+    setIndex(prev => (prev + 1) % DREAM_VIDEO_FILES.length);
+  };
+
+  return (
+    <div>
+      <div className="dream-hero-video" style={{ height: 340 }}>
+        <video
+          ref={videoRef}
+          src={`/videos/${encodeURIComponent(DREAM_VIDEO_FILES[index])}`}
+          autoPlay
+          muted
+          loop={false}
+          playsInline
+          onEnded={handleEnded}
+        />
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
+        {DREAM_VIDEO_FILES.map((_, i) => (
+          <div
+            key={i}
+            style={{
+              width: 6, height: 6, borderRadius: "50%",
+              background: i === index ? "#D4FF3D" : "rgba(255,255,255,0.3)",
+              transition: "background 0.3s ease"
+            }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -1285,60 +1344,143 @@ function ProfileScreen({ user, onUpgrade, isDarkMode }) {
 }
 
 // ============ LOGIN SCREEN ============
+const LIME = "#D4FF3D";
+
 function LoginScreen({ isDarkMode }) {
   const t = getTheme(isDarkMode);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const openSignIn = () => setShowSignIn(true);
+
+  const pillBtnBase = {
+    border: "none", borderRadius: 999, padding: "9px 20px",
+    fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+  };
+
   return (
-    <div style={{
-      minHeight: "100vh", display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center", padding: "40px 24px",
-      background: t.bg, position: "relative", overflow: "hidden", transition: "background 0.5s ease"
-    }}>
+    <div style={{ minHeight: "100vh", background: "#000000" }}>
       <GlobalStyles isDarkMode={isDarkMode} />
-      {isDarkMode && <NightStars />}
-      <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: 380, textAlign: "center" }}>
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>✦</div>
-          <div style={{
-            fontFamily: "Georgia, serif", fontSize: 36, fontWeight: 300,
-            background: t.accentGradient,
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-            marginBottom: 8
-          }}>Astra</div>
-          <div style={{ fontSize: 14, color: t.label, fontStyle: "italic", transition: "color 0.5s ease" }}>
-            Materializa tus sueños con IA
-          </div>
+
+      {/* Promo banner */}
+      <div style={{
+        background: LIME, color: "#000000", textAlign: "center",
+        padding: "8px 16px", fontSize: 12.5, fontWeight: 600,
+      }}>
+        🎁 Regístrate y obtén un descuento extra
+      </div>
+
+      {/* Header */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "16px 20px",
+      }}>
+        <div style={{ color: "#ffffff", fontFamily: "Georgia, serif", fontSize: 22 }}>
+          ✦ Astra
         </div>
-        <div className="glass-card" style={{ overflow: "hidden" }}>
-          <SignIn
-            appearance={{
-              variables: {
-                colorPrimary: t.accentSolid,
-                colorBackground: isDarkMode ? "#0d0d1a" : "#ffffff",
-                colorText: t.textPrimary,
-                colorTextSecondary: t.textSecondary,
-                colorInputBackground: t.inputBg,
-                colorInputText: t.textPrimary,
-                borderRadius: "12px",
-                fontFamily: "Inter, sans-serif",
-              },
-              elements: {
-                card: { background: "transparent", boxShadow: "none" },
-                headerTitle: { color: t.textPrimary },
-                headerSubtitle: { color: t.textSecondary },
-                socialButtonsBlockButton: {
-                  background: t.mutedBg,
-                  border: `1.5px solid ${t.mutedBorder}`,
-                  color: t.textPrimary,
-                },
-                dividerLine: { background: t.mutedBorder },
-                dividerText: { color: t.inactiveTab },
-                formButtonPrimary: { background: t.accentGradient, border: "none" },
-                footerActionLink: { color: t.label },
-              }
-            }}
-          />
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={openSignIn} style={{ ...pillBtnBase, background: "#ffffff", color: "#000000" }}>
+            Iniciar sesión
+          </button>
+          <button onClick={openSignIn} style={{ ...pillBtnBase, background: LIME, color: "#000000" }}>
+            Comenzar
+          </button>
         </div>
       </div>
+
+      {/* Hero */}
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "12px 24px 40px", textAlign: "center" }}>
+        <DreamHero />
+
+        <h1 style={{
+          color: "#ffffff", fontSize: 32, fontWeight: 800, textTransform: "uppercase",
+          lineHeight: 1.15, letterSpacing: "-0.01em", margin: "28px 0 12px", fontFamily: "Inter, sans-serif",
+        }}>
+          Tus sueños en video, en segundos
+        </h1>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.5, marginBottom: 28 }}>
+          Convierte lo que soñaste anoche en un video cinematográfico con inteligencia artificial.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <button
+            onClick={openSignIn}
+            style={{
+              ...pillBtnBase, padding: "14px 24px", fontSize: 14,
+              background: "rgba(212,255,61,0.15)", color: LIME,
+            }}
+          >
+            🎁 Regístrate y obtén un descuento extra
+          </button>
+          <button
+            onClick={openSignIn}
+            style={{
+              ...pillBtnBase, padding: "14px 24px", fontSize: 15, fontWeight: 700,
+              background: LIME, color: "#000000",
+            }}
+          >
+            Pruébalo tú mismo →
+          </button>
+        </div>
+
+        <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginTop: 28 }}>
+          Con tecnología Seedance 2.0 · ByteDance
+        </div>
+      </div>
+
+      {showSignIn && (
+        <div
+          onClick={() => setShowSignIn(false)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            zIndex: 50, padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-card"
+            style={{ overflow: "hidden", width: "100%", maxWidth: 380, position: "relative" }}
+          >
+            <button
+              onClick={() => setShowSignIn(false)}
+              style={{
+                position: "absolute", top: 8, right: 8, zIndex: 1,
+                background: "transparent", border: "none", color: t.textSecondary,
+                fontSize: 22, lineHeight: 1, cursor: "pointer", padding: 6,
+              }}
+            >
+              ×
+            </button>
+            <SignIn
+              appearance={{
+                variables: {
+                  colorPrimary: LIME,
+                  colorBackground: "#0d0d1a",
+                  colorText: t.textPrimary,
+                  colorTextSecondary: t.textSecondary,
+                  colorInputBackground: t.inputBg,
+                  colorInputText: t.textPrimary,
+                  borderRadius: "12px",
+                  fontFamily: "Inter, sans-serif",
+                },
+                elements: {
+                  card: { background: "transparent", boxShadow: "none" },
+                  headerTitle: { color: t.textPrimary },
+                  headerSubtitle: { color: t.textSecondary },
+                  socialButtonsBlockButton: {
+                    background: t.mutedBg,
+                    border: `1.5px solid ${t.mutedBorder}`,
+                    color: t.textPrimary,
+                  },
+                  dividerLine: { background: t.mutedBorder },
+                  dividerText: { color: t.inactiveTab },
+                  formButtonPrimary: { background: LIME, color: "#000000", border: "none" },
+                  footerActionLink: { color: LIME },
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1423,7 +1565,7 @@ export default function Astra() {
   }
 
   if (!isSignedIn) {
-    return <LoginScreen isDarkMode={isDarkMode} />;
+    return <LoginScreen isDarkMode={true} />;
   }
 
   const tabs = [
