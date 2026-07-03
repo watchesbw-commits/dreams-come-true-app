@@ -71,55 +71,37 @@ const useLocalStorage = (key, initialValue) => {
   return [storedValue, setValue];
 };
 
-const computeIsNight = () => {
-  const hour = new Date().getHours();
-  return hour >= 20 || hour < 6;
-};
-
-const useIsNight = () => {
-  const [isDarkMode, setIsDarkMode] = useState(computeIsNight);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsDarkMode(computeIsNight());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return isDarkMode;
-};
-
 // ============ THEME ============
 function getTheme(isDarkMode) {
-  return isDarkMode ? {
+  return {
     bg: "#000000",
     textPrimary: "#ffffff",
     textSecondary: "rgba(255,255,255,0.4)",
-    label: "#00ccff",
-    accentGradient: "linear-gradient(135deg, #0044cc, #00aaff)",
-    accentSolid: "#00ccff",
-    cardBg: "rgba(0,20,60,0.7)",
-    cardBorder: "rgba(0,180,255,0.25)",
-    cardShadow: "0 0 0 1px rgba(0,180,255,0.25), 0 4px 24px rgba(0,150,255,0.1)",
-    cardHoverShadow: "0 0 0 1px rgba(0,180,255,0.5), 0 8px 32px rgba(0,150,255,0.2)",
-    inputBg: "rgba(0,20,60,0.7)",
-    inputBorder: "rgba(0,180,255,0.25)",
-    inputFocusBorder: "rgba(0,180,255,0.6)",
-    inputFocusShadow: "0 0 0 3px rgba(0,180,255,0.15)",
-    placeholder: "rgba(180,220,255,0.3)",
-    btnGradient: "linear-gradient(135deg, #0044cc, #00aaff)",
-    btnShadow: "0 4px 20px rgba(0,150,255,0.5)",
-    btnHoverShadow: "0 6px 24px rgba(0,150,255,0.6)",
-    navbarBg: "rgba(0,0,0,0.85)",
-    navbarBorder: "rgba(0,180,255,0.15)",
-    pillBg: "rgba(0,150,255,0.12)",
-    pillBorder: "rgba(0,200,255,0.4)",
-    pillText: "#00ccff",
-    mutedBg: "rgba(0,180,255,0.08)",
-    mutedBorder: "rgba(0,180,255,0.15)",
-    iconBg: "rgba(0,180,255,0.1)",
-    iconBorder: "rgba(0,180,255,0.25)",
-    toggleOffBg: "rgba(0,180,255,0.12)",
+    label: "#D4FF3D",
+    accentGradient: "linear-gradient(135deg, #A8E619, #D4FF3D)",
+    accentSolid: "#D4FF3D",
+    cardBg: "#0d0d0d",
+    cardBorder: "rgba(255,255,255,0.08)",
+    cardShadow: "0 0 0 1px rgba(255,255,255,0.08)",
+    cardHoverShadow: "0 0 0 1px rgba(212,255,61,0.4)",
+    inputBg: "#0d0d0d",
+    inputBorder: "rgba(255,255,255,0.1)",
+    inputFocusBorder: "#D4FF3D",
+    inputFocusShadow: "0 0 0 3px rgba(212,255,61,0.15)",
+    placeholder: "rgba(255,255,255,0.3)",
+    btnGradient: "#D4FF3D",
+    btnShadow: "0 2px 12px rgba(0,0,0,0.3)",
+    btnHoverShadow: "0 4px 16px rgba(0,0,0,0.4)",
+    navbarBg: "#000000",
+    navbarBorder: "rgba(255,255,255,0.08)",
+    pillBg: "rgba(212,255,61,0.12)",
+    pillBorder: "rgba(212,255,61,0.4)",
+    pillText: "#D4FF3D",
+    mutedBg: "rgba(255,255,255,0.05)",
+    mutedBorder: "rgba(255,255,255,0.1)",
+    iconBg: "rgba(212,255,61,0.1)",
+    iconBorder: "rgba(212,255,61,0.25)",
+    toggleOffBg: "rgba(255,255,255,0.08)",
     errorBg: "rgba(255,80,80,0.1)",
     errorBorder: "rgba(255,80,80,0.35)",
     errorText: "#ff8080",
@@ -127,56 +109,13 @@ function getTheme(isDarkMode) {
     successBg: "rgba(52,211,153,0.1)",
     successBorder: "rgba(52,211,153,0.4)",
     inactiveTab: "rgba(255,255,255,0.35)",
-    orbGradient: "radial-gradient(circle, rgba(0,150,255,0.35), rgba(0,180,255,0.18), transparent)",
-    orbShadow: "0 0 80px rgba(0,150,255,0.25), 0 0 120px rgba(0,180,255,0.12)",
-    ringColor1: "rgba(0,180,255,0.25)",
-    ringColor2: "rgba(0,180,255,0.15)",
-    starColor: "#00ccff",
-    starGlow: "rgba(0,180,255,0.6)",
-    progressTrackBg: "rgba(0,180,255,0.1)",
-  } : {
-    bg: "#f0f5ff",
-    textPrimary: "#001a4d",
-    textSecondary: "#334466",
-    label: "#0066ff",
-    accentGradient: "linear-gradient(135deg, #0066ff, #0099ff)",
-    accentSolid: "#0066ff",
-    cardBg: "rgba(255,255,255,0.9)",
-    cardBorder: "rgba(0,100,255,0.4)",
-    cardShadow: "0 0 0 1.5px rgba(0,100,255,0.4), 0 4px 24px rgba(0,100,255,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
-    cardHoverShadow: "0 0 0 1.5px rgba(0,150,255,0.6), 0 8px 32px rgba(0,100,255,0.15), inset 0 1px 0 rgba(255,255,255,0.9)",
-    inputBg: "rgba(255,255,255,0.95)",
-    inputBorder: "rgba(0,100,255,0.25)",
-    inputFocusBorder: "rgba(0,100,255,0.6)",
-    inputFocusShadow: "0 0 0 3px rgba(0,100,255,0.1)",
-    placeholder: "rgba(0,80,200,0.3)",
-    btnGradient: "linear-gradient(135deg, #0066ff, #0099ff)",
-    btnShadow: "0 4px 16px rgba(0,100,255,0.35)",
-    btnHoverShadow: "0 6px 20px rgba(0,100,255,0.45)",
-    navbarBg: "rgba(255,255,255,0.95)",
-    navbarBorder: "rgba(0,100,255,0.2)",
-    pillBg: "rgba(0,100,255,0.08)",
-    pillBorder: "rgba(0,100,255,0.25)",
-    pillText: "#0066ff",
-    mutedBg: "rgba(0,68,170,0.06)",
-    mutedBorder: "rgba(0,100,255,0.15)",
-    iconBg: "rgba(0,100,255,0.1)",
-    iconBorder: "rgba(0,100,255,0.25)",
-    toggleOffBg: "rgba(0,68,170,0.12)",
-    errorBg: "rgba(255,80,80,0.08)",
-    errorBorder: "rgba(255,80,80,0.3)",
-    errorText: "#cc3333",
-    successText: "#008844",
-    successBg: "rgba(0,200,120,0.08)",
-    successBorder: "rgba(0,200,120,0.4)",
-    inactiveTab: "#7799cc",
-    orbGradient: "radial-gradient(circle, rgba(0,100,255,0.35), rgba(0,150,255,0.18), transparent)",
-    orbShadow: "0 0 80px rgba(0,100,255,0.25), 0 0 120px rgba(0,150,255,0.12)",
-    ringColor1: "rgba(0,100,255,0.25)",
-    ringColor2: "rgba(0,100,255,0.15)",
-    starColor: "#0066ff",
-    starGlow: "rgba(0,100,255,0.6)",
-    progressTrackBg: "rgba(0,100,255,0.1)",
+    orbGradient: "radial-gradient(circle, rgba(212,255,61,0.35), rgba(212,255,61,0.18), transparent)",
+    orbShadow: "0 0 80px rgba(212,255,61,0.25), 0 0 120px rgba(212,255,61,0.12)",
+    ringColor1: "rgba(212,255,61,0.25)",
+    ringColor2: "rgba(212,255,61,0.15)",
+    starColor: "#D4FF3D",
+    starGlow: "rgba(212,255,61,0.6)",
+    progressTrackBg: "rgba(255,255,255,0.08)",
   };
 }
 
@@ -193,27 +132,6 @@ function GlobalStyles({ isDarkMode }) {
       @keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
       @keyframes orbRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       @keyframes starFloat { from { transform: translateY(0) scale(1); opacity: 0.4; } to { transform: translateY(-14px) scale(1.5); opacity: 1; } }
-
-      @keyframes drift1 {
-        0% { background-position: 0 0, 20px 20px; }
-        100% { background-position: 40px 40px, 60px 60px; }
-      }
-      @keyframes drift2 {
-        0% { background-position: 0 0; }
-        100% { background-position: -60px 60px; }
-      }
-      @keyframes drift3 {
-        0% { background-position: 0 0; }
-        100% { background-position: 30px -30px; }
-      }
-      @keyframes twinkle {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
-      }
-      @keyframes twinkle2 {
-        0%, 100% { opacity: 0.6; }
-        50% { opacity: 1; }
-      }
 
       .glass-card {
         background: ${t.cardBg};
@@ -244,7 +162,7 @@ function GlobalStyles({ isDarkMode }) {
 
       .btn-primary {
         background: ${t.btnGradient};
-        color: white;
+        color: #000000;
         border: none;
         border-radius: 12px;
         box-shadow: ${t.btnShadow};
@@ -327,47 +245,6 @@ function DreamHero() {
         ))}
       </div>
     </div>
-  );
-}
-
-function NightStars() {
-  return (
-    <>
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-        backgroundImage: "radial-gradient(circle, rgba(0,180,255,0.9) 1px, transparent 1px)",
-        backgroundSize: "42px 42px",
-        animation: "drift1 25s linear infinite"
-      }} />
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-        backgroundImage: "radial-gradient(circle, rgba(0,240,255,0.7) 1px, transparent 1px)",
-        backgroundSize: "71px 71px",
-        backgroundPosition: "15px 15px",
-        animation: "drift2 35s linear infinite"
-      }} />
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-        backgroundImage: "radial-gradient(circle, rgba(100,220,255,0.95) 1.5px, transparent 1.5px)",
-        backgroundSize: "110px 110px",
-        backgroundPosition: "35px 35px",
-        animation: "drift3 45s linear infinite"
-      }} />
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-        backgroundImage: "radial-gradient(circle, rgba(0,200,255,1) 1px, transparent 1px)",
-        backgroundSize: "160px 160px",
-        backgroundPosition: "80px 80px",
-        animation: "twinkle 3s ease-in-out infinite"
-      }} />
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-        backgroundImage: "radial-gradient(circle, rgba(150,230,255,0.9) 1px, transparent 1px)",
-        backgroundSize: "200px 200px",
-        backgroundPosition: "100px 50px",
-        animation: "twinkle2 4.5s ease-in-out infinite"
-      }} />
-    </>
   );
 }
 
@@ -772,8 +649,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
             transition: "all 0.5s ease"
           }}
         >
-          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "white" : t.label }}>✦</span>
-          <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "white" : t.label }}>Materializar sueño</span>
+          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "#000000" : t.label }}>✦</span>
+          <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "#000000" : t.label }}>Materializar sueño</span>
         </div>
       )}
     </div>
@@ -1148,7 +1025,7 @@ function UniversoScreen({ dreams, currentUserId, isDarkMode }) {
                   width: 36, height: 36, borderRadius: "50%",
                   background: t.accentGradient,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 12, color: "white", fontWeight: 600
+                  fontSize: 12, color: "#000000", fontWeight: 600
                 }}>U</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, color: t.textPrimary, fontWeight: 500, transition: "color 0.5s ease" }}>Usuario Dream</div>
@@ -1237,7 +1114,7 @@ function ProfileScreen({ user, onUpgrade, isDarkMode }) {
             width: 88, height: 88, borderRadius: "50%", margin: "0 auto 16px",
             background: t.accentGradient,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 36, color: "white", fontWeight: 300, fontFamily: "Georgia, serif",
+            fontSize: 36, color: "#000000", fontWeight: 300, fontFamily: "Georgia, serif",
             boxShadow: `0 12px 36px ${t.cardBorder}`
           }}>{user.name.charAt(0).toUpperCase()}</div>
         )}
@@ -1489,7 +1366,7 @@ function LoginScreen({ isDarkMode }) {
 export default function Astra() {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const [tab, setTab] = useState("sonar");
-  const isDarkMode = useIsNight();
+  const isDarkMode = true;
   const t = getTheme(isDarkMode);
 
   const [credits, setCredits] = useState(null);
@@ -1583,7 +1460,6 @@ export default function Astra() {
       transition: "all 0.5s ease"
     }}>
       <GlobalStyles isDarkMode={isDarkMode} />
-      {isDarkMode && <NightStars />}
 
       <div style={{ position: "relative", zIndex: 2, paddingBottom: 100, minHeight: "100vh" }}>
         {tab === "sonar" && (
