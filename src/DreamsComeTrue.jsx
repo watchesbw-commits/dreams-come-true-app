@@ -188,6 +188,7 @@ function GlobalStyles({ isDarkMode }) {
 
       .dream-hero-video {
         width: 100%;
+        height: 340px;
         border-radius: 24px;
         overflow: hidden;
         display: block;
@@ -197,6 +198,100 @@ function GlobalStyles({ isDarkMode }) {
         height: 100%;
         object-fit: cover;
         display: block;
+      }
+
+      /* ============ DESKTOP RESPONSIVE (>=1024px) ============ */
+      /* Mobile design above this line is untouched. Everything below only
+         takes effect at the desktop breakpoint. */
+
+      .astra-app-shell { max-width: 430px; }
+      .astra-sidebar { display: none; }
+      .astra-sonar-preview-col { display: none; }
+      .universo-card-media { aspect-ratio: 16 / 9; }
+
+      .astra-hide-mobile-busy { display: none; }
+      .astra-mobile-fullscreen { display: block; }
+
+      .astra-hero-content-desktop { display: none; }
+      .astra-hero-live-badge { animation: pulse 1.6s ease-in-out infinite; }
+
+      @media (min-width: 1024px) {
+        .astra-app-shell { max-width: none; }
+
+        .astra-sidebar {
+          display: flex;
+          flex-direction: column;
+          position: fixed;
+          top: 0; left: 0; bottom: 0;
+          width: 240px;
+          padding: 24px 16px;
+          background: ${t.bg};
+          border-right: 1.5px solid ${t.navbarBorder};
+          z-index: 50;
+        }
+        .astra-bottom-nav { display: none; }
+        .astra-main-content {
+          margin-left: 240px;
+          max-width: 1200px;
+          padding: 0 40px;
+        }
+
+        .astra-hide-mobile-busy { display: block; }
+        .astra-mobile-fullscreen { display: none; }
+
+        .astra-sonar-layout {
+          display: grid;
+          grid-template-columns: 1fr 400px;
+          gap: 32px;
+          align-items: start;
+        }
+        .astra-sonar-preview-col {
+          display: block;
+          position: sticky;
+          top: 24px;
+        }
+
+        .astra-universo-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+        }
+        .universo-card { margin: 0 !important; }
+        .universo-card-media { aspect-ratio: 9 / 13; }
+
+        .astra-hero-stage { position: relative; }
+        .astra-hero-header {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          background: rgba(0,0,0,0.35);
+          backdrop-filter: blur(10px);
+        }
+        .astra-hero-video-wrap { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+        .dream-hero-video { height: 76vh; border-radius: 0; }
+        .astra-hero-content-mobile { display: none; }
+        .astra-hero-content-desktop {
+          display: block;
+          position: absolute;
+          bottom: 56px;
+          left: 56px;
+          right: 56px;
+          max-width: 640px;
+          z-index: 3;
+        }
+        .astra-hero-scrim {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 55%, transparent 100%);
+          pointer-events: none;
+          z-index: 2;
+        }
+        .astra-hero-dots {
+          position: absolute;
+          bottom: 24px;
+          right: 24px;
+          margin-top: 0 !important;
+          z-index: 3;
+        }
       }
     `}</style>
   );
@@ -221,7 +316,7 @@ function DreamHero() {
 
   return (
     <div>
-      <div className="dream-hero-video" style={{ height: 340 }}>
+      <div className="dream-hero-video">
         <video
           ref={videoRef}
           src={`/videos/${encodeURIComponent(DREAM_VIDEO_FILES[index])}`}
@@ -232,7 +327,7 @@ function DreamHero() {
           onEnded={handleEnded}
         />
       </div>
-      <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
+      <div className="astra-hero-dots" style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
         {DREAM_VIDEO_FILES.map((_, i) => (
           <div
             key={i}
@@ -266,6 +361,15 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
   const [showResult, setShowResult] = useState(false);
   const [resultData, setResultData] = useState(null);
   const [error, setError] = useState("");
+  const [previewProgress, setPreviewProgress] = useState(0);
+
+  useEffect(() => {
+    if (!generating) { setPreviewProgress(0); return; }
+    const interval = setInterval(() => {
+      setPreviewProgress(p => Math.min(p + 0.375, 90));
+    }, 500);
+    return () => clearInterval(interval);
+  }, [generating]);
 
   const [faceImage, setFaceImage] = useLocalStorage(`faceImage_${userId}`, null);
   const [faceElementId, setFaceElementId] = useLocalStorage(`faceElementId_${userId}`, null);
@@ -407,20 +511,11 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     onDreamCreated(newDream, updatedUser);
   }, [dreamText, isPublic, user, canGenerate, onDreamCreated, includeFace, faceElementId]);
 
-  if (generating) return <GeneratingScreen isDarkMode={isDarkMode} />;
-  if (showResult && resultData) {
-    return (
-      <ResultScreen
-        dream={resultData.dream}
-        user={resultData.user}
-        isDarkMode={isDarkMode}
-        onBack={() => { setShowResult(false); setDreamText(""); setError(""); }}
-      />
-    );
-  }
+  const isBusy = generating || (showResult && !!resultData);
 
   return (
-    <div style={{ padding: "0 0 20px" }}>
+    <div className="astra-sonar-layout">
+    <div className={`astra-sonar-form-col${isBusy ? " astra-hide-mobile-busy" : ""}`} style={{ padding: "0 0 20px" }}>
       {/* Header */}
       <div style={{ padding: "24px 24px 12px" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.22em", color: t.label, textTransform: "uppercase", marginBottom: 4, fontWeight: 600, transition: "color 0.5s ease" }}>
@@ -654,6 +749,73 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "#000000" : t.label }}>Materializar sueño</span>
         </div>
       )}
+    </div>
+
+    {/* Desktop-only preview panel (hidden on mobile) */}
+    <div className="astra-sonar-preview-col">
+      {!isBusy && (
+        <div className="glass-card" style={{
+          padding: 24, minHeight: 420, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", textAlign: "center"
+        }}>
+          <span style={{ fontSize: 40, marginBottom: 12 }}>✦</span>
+          <div style={{ color: t.textSecondary, fontSize: 14 }}>Tu video aparecerá aquí</div>
+        </div>
+      )}
+      {generating && (
+        <div className="glass-card" style={{
+          padding: 24, minHeight: 420, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", textAlign: "center"
+        }}>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: 15, color: t.label, marginBottom: 14 }}>
+            Generando tu sueño...
+          </div>
+          <div style={{ width: "100%", maxWidth: 220, height: 3, borderRadius: 2, background: t.progressTrackBg, overflow: "hidden", marginBottom: 8 }}>
+            <div style={{
+              height: "100%", borderRadius: 2, transition: "width 0.5s ease",
+              width: `${previewProgress}%`, background: t.accentGradient
+            }} />
+          </div>
+          <div style={{ fontSize: 12, color: t.textSecondary }}>{Math.round(previewProgress)}%</div>
+        </div>
+      )}
+      {showResult && resultData && (
+        <div className="glass-card" style={{ overflow: "hidden" }}>
+          <video
+            src={resultData.dream.videoUrl}
+            controls
+            playsInline
+            style={{ width: "100%", display: "block", aspectRatio: "9/16", background: "#000", objectFit: "contain" }}
+          />
+          <div style={{ padding: 16 }}>
+            <button
+              className="btn-primary"
+              onClick={() => { setShowResult(false); setDreamText(""); setError(""); }}
+              style={{ width: "100%", padding: 12, fontSize: 13, fontWeight: 600, fontFamily: "inherit", border: "none" }}
+            >
+              Crear otro sueño
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* Mobile-only full-screen states (hidden on desktop) */}
+    {generating && (
+      <div className="astra-mobile-fullscreen">
+        <GeneratingScreen isDarkMode={isDarkMode} />
+      </div>
+    )}
+    {showResult && resultData && (
+      <div className="astra-mobile-fullscreen">
+        <ResultScreen
+          dream={resultData.dream}
+          user={resultData.user}
+          isDarkMode={isDarkMode}
+          onBack={() => { setShowResult(false); setDreamText(""); setError(""); }}
+        />
+      </div>
+    )}
     </div>
   );
 }
@@ -1056,9 +1218,9 @@ function UniversoScreen({ isDarkMode }) {
           Aún no hay sueños públicos. ¡Sé el primero!
         </div>
       ) : (
-        communityDreams.map(d => {
-          return (
-            <div key={d.id} className="glass-card" style={{ margin: "0 16px 14px", padding: "16px" }}>
+        <div className="astra-universo-grid">
+          {communityDreams.map(d => (
+            <div key={d.id} className="glass-card universo-card" style={{ margin: "0 16px 14px", padding: "16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: "50%",
@@ -1080,7 +1242,7 @@ function UniversoScreen({ isDarkMode }) {
                 )}
               </div>
 
-              <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#000", aspectRatio: "16/9" }}>
+              <div className="universo-card-media" style={{ borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#000" }}>
                 <video
                   src={d.video_url}
                   autoPlay
@@ -1098,8 +1260,8 @@ function UniversoScreen({ isDarkMode }) {
                 "{d.text}"
               </div>
             </div>
-          );
-        })
+          ))}
+        </div>
       )}
 
       {!loading && !error && hasMore && (
@@ -1293,62 +1455,98 @@ function LoginScreen({ isDarkMode }) {
         🎁 Regístrate y obtén un descuento extra
       </div>
 
-      {/* Header */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "16px 20px",
-      }}>
-        <div style={{ color: "#ffffff", fontFamily: "Georgia, serif", fontSize: 22 }}>
-          ✦ Astra
+      <div className="astra-hero-stage">
+        {/* Header */}
+        <div className="astra-hero-header" style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "16px 20px", position: "relative", zIndex: 4,
+        }}>
+          <div style={{ color: "#ffffff", fontFamily: "Georgia, serif", fontSize: 22 }}>
+            ✦ Astra
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={openSignIn} style={{ ...pillBtnBase, background: "#ffffff", color: "#000000" }}>
+              Iniciar sesión
+            </button>
+            <button onClick={openSignIn} style={{ ...pillBtnBase, background: LIME, color: "#000000" }}>
+              Comenzar
+            </button>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={openSignIn} style={{ ...pillBtnBase, background: "#ffffff", color: "#000000" }}>
-            Iniciar sesión
-          </button>
-          <button onClick={openSignIn} style={{ ...pillBtnBase, background: LIME, color: "#000000" }}>
-            Comenzar
-          </button>
+
+        {/* Hero video */}
+        <div className="astra-hero-video-wrap" style={{ maxWidth: 480, margin: "0 auto", padding: "12px 24px 0" }}>
+          <DreamHero />
+        </div>
+
+        {/* Desktop-only scrim + overlay content (hidden on mobile) */}
+        <div className="astra-hero-scrim" />
+        <div className="astra-hero-content-desktop">
+          <div className="astra-hero-live-badge" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff3b30" }} />
+            <span style={{ fontSize: 11, letterSpacing: "0.14em", color: "rgba(255,255,255,0.85)", fontWeight: 700 }}>
+              GENERADO POR IA · EN VIVO
+            </span>
+          </div>
+          <h1 style={{ color: "#ffffff", fontSize: 48, fontWeight: 800, lineHeight: 1.1, margin: "0 0 16px", fontFamily: "Inter, sans-serif" }}>
+            Tus sueños, en video
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 16, lineHeight: 1.5, marginBottom: 24, maxWidth: 480 }}>
+            Convierte lo que soñaste anoche en un video cinematográfico con inteligencia artificial.
+          </p>
+          <div style={{ display: "flex", gap: 12 }}>
+            <button onClick={openSignIn} style={{ ...pillBtnBase, padding: "14px 28px", fontSize: 15, background: "#ffffff", color: "#000000" }}>
+              Probar gratis
+            </button>
+            <button
+              onClick={openSignIn}
+              style={{
+                ...pillBtnBase, padding: "14px 28px", fontSize: 15,
+                background: "rgba(255,255,255,0.12)", color: "#ffffff", border: "1.5px solid rgba(255,255,255,0.3)",
+              }}
+            >
+              Ver ejemplos
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile-only content below the video (hidden on desktop) */}
+        <div className="astra-hero-content-mobile" style={{ maxWidth: 480, margin: "0 auto", padding: "28px 24px 0", textAlign: "center" }}>
+          <h1 style={{
+            color: "#ffffff", fontSize: 32, fontWeight: 800, textTransform: "uppercase",
+            lineHeight: 1.15, letterSpacing: "-0.01em", margin: "0 0 12px", fontFamily: "Inter, sans-serif",
+          }}>
+            Tus sueños en video, en segundos
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.5, marginBottom: 28 }}>
+            Convierte lo que soñaste anoche en un video cinematográfico con inteligencia artificial.
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <button
+              onClick={openSignIn}
+              style={{
+                ...pillBtnBase, padding: "14px 24px", fontSize: 14,
+                background: "rgba(212,255,61,0.15)", color: LIME,
+              }}
+            >
+              🎁 Regístrate y obtén un descuento extra
+            </button>
+            <button
+              onClick={openSignIn}
+              style={{
+                ...pillBtnBase, padding: "14px 24px", fontSize: 15, fontWeight: 700,
+                background: LIME, color: "#000000",
+              }}
+            >
+              Pruébalo tú mismo →
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Hero */}
-      <div style={{ maxWidth: 480, margin: "0 auto", padding: "12px 24px 40px", textAlign: "center" }}>
-        <DreamHero />
-
-        <h1 style={{
-          color: "#ffffff", fontSize: 32, fontWeight: 800, textTransform: "uppercase",
-          lineHeight: 1.15, letterSpacing: "-0.01em", margin: "28px 0 12px", fontFamily: "Inter, sans-serif",
-        }}>
-          Tus sueños en video, en segundos
-        </h1>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.5, marginBottom: 28 }}>
-          Convierte lo que soñaste anoche en un video cinematográfico con inteligencia artificial.
-        </p>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <button
-            onClick={openSignIn}
-            style={{
-              ...pillBtnBase, padding: "14px 24px", fontSize: 14,
-              background: "rgba(212,255,61,0.15)", color: LIME,
-            }}
-          >
-            🎁 Regístrate y obtén un descuento extra
-          </button>
-          <button
-            onClick={openSignIn}
-            style={{
-              ...pillBtnBase, padding: "14px 24px", fontSize: 15, fontWeight: 700,
-              background: LIME, color: "#000000",
-            }}
-          >
-            Pruébalo tú mismo →
-          </button>
-        </div>
-
-        <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginTop: 28 }}>
-          Con tecnología Seedance 2.0 · ByteDance
-        </div>
+      <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, textAlign: "center", padding: "28px 24px 40px" }}>
+        Con tecnología Seedance 2.0 · ByteDance
       </div>
 
       {showSignIn && (
@@ -1501,15 +1699,45 @@ export default function Astra() {
   ];
 
   return (
-    <div style={{
-      width: "100%", maxWidth: 430, margin: "0 auto",
+    <div className="astra-app-shell" style={{
+      width: "100%", margin: "0 auto",
       minHeight: "100vh", background: t.bg,
       position: "relative", overflow: "hidden", fontFamily: "'Inter', sans-serif",
       transition: "all 0.5s ease"
     }}>
       <GlobalStyles isDarkMode={isDarkMode} />
 
-      <div style={{ position: "relative", zIndex: 2, paddingBottom: 100, minHeight: "100vh" }}>
+      {/* Desktop-only sidebar (hidden on mobile) */}
+      <div className="astra-sidebar">
+        <div style={{ color: t.textPrimary, fontFamily: "Georgia, serif", fontSize: 20, marginBottom: 32, padding: "0 8px" }}>
+          ✦ Astra
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
+          {tabs.map(tb => (
+            <div
+              key={tb.id}
+              onClick={() => setTab(tb.id)}
+              style={{
+                display: "flex", alignItems: "center", gap: 12,
+                padding: "10px 12px", borderRadius: 10, cursor: "pointer",
+                background: tab === tb.id ? t.mutedBg : "transparent",
+                transition: "background 0.2s ease"
+              }}
+            >
+              <span style={{ fontSize: 18, opacity: tab === tb.id ? 1 : 0.5 }}>{tb.icon}</span>
+              <span style={{
+                fontSize: 13, fontWeight: 600,
+                color: tab === tb.id ? t.label : t.inactiveTab,
+              }}>{tb.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="credits-pill" style={{ padding: "10px 12px", fontSize: 12, fontWeight: 500, textAlign: "center" }}>
+          ✦ {credits === null ? "..." : credits} sueño{credits === 1 ? "" : "s"} disponible{credits === 1 ? "" : "s"}
+        </div>
+      </div>
+
+      <div className="astra-main-content" style={{ position: "relative", zIndex: 2, paddingBottom: 100, minHeight: "100vh" }}>
         {tab === "sonar" && (
           <SonarScreen
             user={fullUser}
@@ -1526,7 +1754,7 @@ export default function Astra() {
         {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} isDarkMode={isDarkMode} />}
       </div>
 
-      <div className="navbar-glass" style={{
+      <div className="navbar-glass astra-bottom-nav" style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430,
         display: "flex", justifyContent: "space-around",
