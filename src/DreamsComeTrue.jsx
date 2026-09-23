@@ -74,33 +74,33 @@ const useLocalStorage = (key, initialValue) => {
 // ============ THEME ============
 function getTheme(isDarkMode) {
   return {
-    bg: "#000000",
+    bg: "#080B14",
     textPrimary: "#ffffff",
-    textSecondary: "rgba(255,255,255,0.4)",
-    label: "#D4FF3D",
-    accentGradient: "linear-gradient(135deg, #A8E619, #D4FF3D)",
-    accentSolid: "#D4FF3D",
-    cardBg: "#0d0d0d",
-    cardBorder: "rgba(255,255,255,0.08)",
-    cardShadow: "0 0 0 1px rgba(255,255,255,0.08)",
-    cardHoverShadow: "0 0 0 1px rgba(212,255,61,0.4)",
-    inputBg: "#0d0d0d",
-    inputBorder: "rgba(255,255,255,0.1)",
-    inputFocusBorder: "#D4FF3D",
-    inputFocusShadow: "0 0 0 3px rgba(212,255,61,0.15)",
-    placeholder: "rgba(255,255,255,0.3)",
-    btnGradient: "#D4FF3D",
-    btnShadow: "0 2px 12px rgba(0,0,0,0.3)",
-    btnHoverShadow: "0 4px 16px rgba(0,0,0,0.4)",
-    navbarBg: "#000000",
-    navbarBorder: "rgba(255,255,255,0.08)",
-    pillBg: "rgba(212,255,61,0.12)",
-    pillBorder: "rgba(212,255,61,0.4)",
-    pillText: "#D4FF3D",
-    mutedBg: "rgba(255,255,255,0.05)",
-    mutedBorder: "rgba(255,255,255,0.1)",
-    iconBg: "rgba(212,255,61,0.1)",
-    iconBorder: "rgba(212,255,61,0.25)",
+    textSecondary: "rgba(200,210,255,0.45)",
+    label: "#7EB3FF",
+    accentGradient: "linear-gradient(135deg, #4F7FFF, #8B5CF6)",
+    accentSolid: "#4F7FFF",
+    cardBg: "rgba(255,255,255,0.04)",
+    cardBorder: "rgba(79,127,255,0.12)",
+    cardShadow: "0 0 0 1px rgba(79,127,255,0.1), 0 4px 24px rgba(0,0,10,0.4)",
+    cardHoverShadow: "0 0 0 1px rgba(79,127,255,0.35), 0 8px 32px rgba(79,127,255,0.15)",
+    inputBg: "rgba(255,255,255,0.03)",
+    inputBorder: "rgba(79,127,255,0.18)",
+    inputFocusBorder: "#4F7FFF",
+    inputFocusShadow: "0 0 0 3px rgba(79,127,255,0.2), 0 0 20px rgba(79,127,255,0.12)",
+    placeholder: "rgba(150,170,255,0.35)",
+    btnGradient: "linear-gradient(135deg, #4F7FFF, #8B5CF6)",
+    btnShadow: "0 2px 16px rgba(79,127,255,0.35)",
+    btnHoverShadow: "0 6px 24px rgba(79,127,255,0.5)",
+    navbarBg: "rgba(8,11,20,0.92)",
+    navbarBorder: "rgba(79,127,255,0.12)",
+    pillBg: "rgba(79,127,255,0.12)",
+    pillBorder: "rgba(79,127,255,0.4)",
+    pillText: "#7EB3FF",
+    mutedBg: "rgba(255,255,255,0.04)",
+    mutedBorder: "rgba(255,255,255,0.08)",
+    iconBg: "rgba(79,127,255,0.12)",
+    iconBorder: "rgba(79,127,255,0.25)",
     toggleOffBg: "rgba(255,255,255,0.08)",
     errorBg: "rgba(255,80,80,0.1)",
     errorBorder: "rgba(255,80,80,0.35)",
@@ -108,14 +108,14 @@ function getTheme(isDarkMode) {
     successText: "#34d399",
     successBg: "rgba(52,211,153,0.1)",
     successBorder: "rgba(52,211,153,0.4)",
-    inactiveTab: "rgba(255,255,255,0.35)",
-    orbGradient: "radial-gradient(circle, rgba(212,255,61,0.35), rgba(212,255,61,0.18), transparent)",
-    orbShadow: "0 0 80px rgba(212,255,61,0.25), 0 0 120px rgba(212,255,61,0.12)",
-    ringColor1: "rgba(212,255,61,0.25)",
-    ringColor2: "rgba(212,255,61,0.15)",
-    starColor: "#D4FF3D",
-    starGlow: "rgba(212,255,61,0.6)",
-    progressTrackBg: "rgba(255,255,255,0.08)",
+    inactiveTab: "rgba(200,210,255,0.35)",
+    orbGradient: "radial-gradient(circle, rgba(79,127,255,0.4), rgba(139,92,246,0.2), transparent)",
+    orbShadow: "0 0 80px rgba(79,127,255,0.3), 0 0 140px rgba(139,92,246,0.15)",
+    ringColor1: "rgba(79,127,255,0.25)",
+    ringColor2: "rgba(139,92,246,0.15)",
+    starColor: "#7EB3FF",
+    starGlow: "rgba(79,127,255,0.7)",
+    progressTrackBg: "rgba(79,127,255,0.1)",
   };
 }
 
@@ -162,7 +162,7 @@ function GlobalStyles({ isDarkMode }) {
 
       .btn-primary {
         background: ${t.btnGradient};
-        color: #000000;
+        color: #ffffff;
         border: none;
         border-radius: 12px;
         box-shadow: ${t.btnShadow};
@@ -292,6 +292,12 @@ function GlobalStyles({ isDarkMode }) {
           margin-top: 0 !important;
           z-index: 3;
         }
+
+        .astra-how-it-works-grid {
+          flex-direction: row !important;
+          justify-content: space-between;
+          align-items: flex-start;
+        }
       }
     `}</style>
   );
@@ -333,7 +339,7 @@ function DreamHero() {
             key={i}
             style={{
               width: 6, height: 6, borderRadius: "50%",
-              background: i === index ? "#D4FF3D" : "rgba(255,255,255,0.3)",
+              background: i === index ? "#4F7FFF" : "rgba(255,255,255,0.3)",
               transition: "background 0.3s ease"
             }}
           />
@@ -745,8 +751,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
             transition: "all 0.5s ease"
           }}
         >
-          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "#000000" : t.label }}>✦</span>
-          <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "#000000" : t.label }}>Materializar sueño</span>
+          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "#ffffff" : t.label }}>✦</span>
+          <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "#ffffff" : t.label }}>Materializar sueño</span>
         </div>
       )}
     </div>
@@ -1542,6 +1548,41 @@ function LoginScreen({ isDarkMode }) {
               Pruébalo tú mismo →
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Cómo funciona */}
+      <div style={{ padding: "56px 24px 40px", maxWidth: 960, margin: "0 auto" }}>
+        <h2 style={{
+          color: "#ffffff", fontSize: 26, fontWeight: 800, textAlign: "center",
+          margin: "0 0 40px", fontFamily: "Inter, sans-serif",
+        }}>
+          Así de simple
+        </h2>
+        <div className="astra-how-it-works-grid" style={{ display: "flex", flexDirection: "column", gap: 36 }}>
+          {[
+            { n: "1", title: "Describe tu sueño", text: "Escribe lo que soñaste, en tus propias palabras" },
+            { n: "2", title: "Elige tu estilo", text: "Real, Anime, Terror, Fantasy... tú decides la estética" },
+            { n: "3", title: "Recíbelo en video", text: "La IA lo convierte en una escena cinematográfica en segundos" },
+          ].map((step) => (
+            <div key={step.n} style={{ textAlign: "center", padding: "0 12px" }}>
+              <div style={{
+                fontSize: 40, fontWeight: 800, color: LIME, fontFamily: "Inter, sans-serif",
+                marginBottom: 12, lineHeight: 1,
+              }}>
+                {step.n}
+              </div>
+              <div style={{
+                color: "#ffffff", fontSize: 17, fontWeight: 700, marginBottom: 8,
+                fontFamily: "Inter, sans-serif",
+              }}>
+                {step.title}
+              </div>
+              <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.5 }}>
+                {step.text}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
