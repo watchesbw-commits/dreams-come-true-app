@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useUser, useClerk, SignIn } from "@clerk/clerk-react";
+import {
+  IconMicrophone, IconLock, IconWorld, IconCamera,
+  IconSparkles, IconPhoto, IconShieldLock
+} from "@tabler/icons-react";
 
 // ============ BACKEND ============
 const API_URL = import.meta.env.VITE_BACKEND_URL || "https://dreams-come-true-backend.onrender.com";
@@ -124,8 +128,9 @@ function GlobalStyles({ isDarkMode }) {
   const t = getTheme(isDarkMode);
   return (
     <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap');
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+      body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
       ::-webkit-scrollbar { display: none; }
 
       @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -594,7 +599,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           maxLength={5000}
           style={{
             width: "100%", minHeight: 80, padding: 10,
-            fontFamily: "'Georgia', serif", fontSize: 16, fontStyle: "italic",
+            fontFamily: "'DM Serif Display', Georgia, serif", fontSize: 16, fontStyle: "italic",
             lineHeight: 1.5, resize: "none"
           }}
         />
@@ -605,7 +610,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
               background: t.iconBg, border: `1.5px solid ${t.iconBorder}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               color: t.label, fontSize: 16, cursor: "pointer", transition: "all 0.5s ease"
-            }}>🎤</div>
+            }}><IconMicrophone size={16} stroke={1.5} /></div>
             <span style={{ fontSize: 11, color: t.textSecondary, transition: "color 0.5s ease" }}>o di tu sueño</span>
           </div>
           <span style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>{dreamText.length}/5000</span>
@@ -654,7 +659,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
             width: 32, height: 32, borderRadius: 10,
             background: isPublic ? t.iconBg : t.mutedBg,
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, transition: "all 0.5s ease"
-          }}>{isPublic ? "🌍" : "🔒"}</div>
+          }}>{isPublic ? <IconWorld size={18} stroke={1.5} /> : <IconShieldLock size={18} stroke={1.5} />}</div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.textPrimary, transition: "color 0.5s ease" }}>
               {isPublic ? "Compartir en Universo" : "Solo para ti"}
@@ -696,7 +701,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
               width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
               background: t.iconBg, border: `1.5px solid ${t.iconBorder}`,
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, transition: "all 0.5s ease"
-            }}>📷</div>
+            }}><IconCamera size={22} stroke={1.5} /></div>
           )}
 
           <div style={{ flex: 1 }}>
@@ -751,7 +756,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           margin: "0 16px 18px", padding: 16,
           display: "flex", alignItems: "center", justifyContent: "center", gap: 10
         }}>
-          <span style={{ fontSize: 16 }}>✦</span>
+          <IconSparkles size={18} stroke={1.5} />
           <span style={{ fontSize: 15, fontWeight: 500 }}>Suscribirse — $12.99/mes</span>
         </div>
       ) : (
@@ -766,7 +771,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
             transition: "all 0.5s ease"
           }}
         >
-          <span style={{ fontSize: 16, color: dreamText.trim() && canGenerate ? "#ffffff" : t.label }}>✦</span>
+          <IconSparkles size={18} stroke={1.5} color={dreamText.trim() && canGenerate ? "#ffffff" : t.label} />
           <span style={{ fontSize: 15, fontWeight: 500, color: dreamText.trim() && canGenerate ? "#ffffff" : t.label }}>Materializar sueño</span>
         </div>
       )}
