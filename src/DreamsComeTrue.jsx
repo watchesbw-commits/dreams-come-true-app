@@ -775,49 +775,50 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     {/* Desktop-only preview panel (hidden on mobile) */}
     <div className="astra-sonar-preview-col">
       {!isBusy && (
-        pastDreams.length > 0 ? (
-          <div className="glass-card" style={{ overflow: "hidden" }}>
-            <video
-              key={pastDreams[activePastIdx]?.video_url}
-              src={pastDreams[activePastIdx]?.video_url}
-              autoPlay
-              muted
-              loop
-              playsInline
-              style={{ width: "100%", display: "block", aspectRatio: "9/16", background: "#000", objectFit: "contain" }}
-            />
-            <div style={{ padding: "12px 16px" }}>
-              <div style={{ fontSize: 12, color: t.textSecondary, fontStyle: "italic", marginBottom: 10, lineHeight: 1.4 }}>
-                {pastDreams[activePastIdx]?.text}
+        (() => {
+          const displayDreams = pastDreams.length > 0
+            ? pastDreams
+            : DREAM_VIDEO_FILES.map((f, i) => ({ video_url: `/videos/${encodeURIComponent(f)}`, text: null, _demo: true, id: i }));
+          const activeItem = displayDreams[activePastIdx] || displayDreams[0];
+          return (
+            <div className="glass-card" style={{ overflow: "hidden" }}>
+              <video
+                key={activeItem.video_url}
+                src={activeItem.video_url}
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{ width: "100%", display: "block", aspectRatio: "9/16", background: "#000", objectFit: "contain" }}
+              />
+              <div style={{ padding: "12px 16px" }}>
+                {activeItem.text && (
+                  <div style={{ fontSize: 12, color: t.textSecondary, fontStyle: "italic", marginBottom: 10, lineHeight: 1.4 }}>
+                    {activeItem.text}
+                  </div>
+                )}
+                {pastDreamsLoading && (
+                  <div style={{ fontSize: 11, color: t.textSecondary, marginBottom: 8 }}>Cargando tus sueños...</div>
+                )}
+                {displayDreams.length > 1 && (
+                  <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                    {displayDreams.map((_, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setActivePastIdx(i)}
+                        style={{
+                          width: 7, height: 7, borderRadius: "50%", cursor: "pointer",
+                          background: i === activePastIdx ? t.accentSolid : t.mutedBorder,
+                          transition: "background 0.2s"
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-              {pastDreams.length > 1 && (
-                <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
-                  {pastDreams.map((_, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setActivePastIdx(i)}
-                      style={{
-                        width: 7, height: 7, borderRadius: "50%", cursor: "pointer",
-                        background: i === activePastIdx ? t.accentSolid : t.mutedBorder,
-                        transition: "background 0.2s"
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
-          </div>
-        ) : (
-          <div className="glass-card" style={{
-            padding: 24, minHeight: 420, display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center", textAlign: "center"
-          }}>
-            <span style={{ fontSize: 40, marginBottom: 12 }}>✦</span>
-            <div style={{ color: t.textSecondary, fontSize: 14 }}>
-              {pastDreamsLoading ? "Cargando tus sueños..." : "Tu video aparecerá aquí"}
-            </div>
-          </div>
-        )
+          );
+        })()
       )}
       {generating && (
         <div className="glass-card" style={{
