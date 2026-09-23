@@ -789,7 +789,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
                 muted
                 loop
                 playsInline
-                style={{ width: "100%", display: "block", aspectRatio: "9/16", background: "#000", objectFit: "contain" }}
+                style={{ width: "100%", display: "block", aspectRatio: "16/9", background: "#000", objectFit: "cover" }}
               />
               <div style={{ padding: "12px 16px" }}>
                 {activeItem.text && (
