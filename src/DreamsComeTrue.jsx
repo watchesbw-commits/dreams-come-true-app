@@ -377,6 +377,19 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     return () => clearInterval(interval);
   }, [generating]);
 
+  const [pastDreams, setPastDreams] = useState([]);
+  const [pastDreamsLoading, setPastDreamsLoading] = useState(false);
+  const [activePastIdx, setActivePastIdx] = useState(0);
+
+  useEffect(() => {
+    if (!userId) return;
+    setPastDreamsLoading(true);
+    callAPI(`/api/dreams/user/${userId}`).then(res => {
+      if (res?.dreams) setPastDreams(res.dreams);
+      setPastDreamsLoading(false);
+    });
+  }, [userId]);
+
   const [faceImage, setFaceImage] = useLocalStorage(`faceImage_${userId}`, null);
   const [faceElementId, setFaceElementId] = useLocalStorage(`faceElementId_${userId}`, null);
   const [includeFace, setIncludeFace] = useLocalStorage(`includeFace_${userId}`, false);
@@ -514,6 +527,8 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     setResultData({ dream: newDream, user: updatedUser });
     setGenerating(false);
     setShowResult(true);
+    setPastDreams(prev => [newDream, ...prev]);
+    setActivePastIdx(0);
     onDreamCreated(newDream, updatedUser);
   }, [dreamText, isPublic, user, canGenerate, onDreamCreated, includeFace, faceElementId]);
 
@@ -760,13 +775,49 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     {/* Desktop-only preview panel (hidden on mobile) */}
     <div className="astra-sonar-preview-col">
       {!isBusy && (
-        <div className="glass-card" style={{
-          padding: 24, minHeight: 420, display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", textAlign: "center"
-        }}>
-          <span style={{ fontSize: 40, marginBottom: 12 }}>✦</span>
-          <div style={{ color: t.textSecondary, fontSize: 14 }}>Tu video aparecerá aquí</div>
-        </div>
+        pastDreams.length > 0 ? (
+          <div className="glass-card" style={{ overflow: "hidden" }}>
+            <video
+              key={pastDreams[activePastIdx]?.video_url}
+              src={pastDreams[activePastIdx]?.video_url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              style={{ width: "100%", display: "block", aspectRatio: "9/16", background: "#000", objectFit: "contain" }}
+            />
+            <div style={{ padding: "12px 16px" }}>
+              <div style={{ fontSize: 12, color: t.textSecondary, fontStyle: "italic", marginBottom: 10, lineHeight: 1.4 }}>
+                {pastDreams[activePastIdx]?.text}
+              </div>
+              {pastDreams.length > 1 && (
+                <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                  {pastDreams.map((_, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setActivePastIdx(i)}
+                      style={{
+                        width: 7, height: 7, borderRadius: "50%", cursor: "pointer",
+                        background: i === activePastIdx ? t.accentSolid : t.mutedBorder,
+                        transition: "background 0.2s"
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="glass-card" style={{
+            padding: 24, minHeight: 420, display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center", textAlign: "center"
+          }}>
+            <span style={{ fontSize: 40, marginBottom: 12 }}>✦</span>
+            <div style={{ color: t.textSecondary, fontSize: 14 }}>
+              {pastDreamsLoading ? "Cargando tus sueños..." : "Tu video aparecerá aquí"}
+            </div>
+          </div>
+        )
       )}
       {generating && (
         <div className="glass-card" style={{
