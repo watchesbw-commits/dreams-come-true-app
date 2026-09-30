@@ -8,6 +8,9 @@ import {
 // ============ BACKEND ============
 const API_URL = import.meta.env.VITE_BACKEND_URL || "https://dreams-come-true-backend.onrender.com";
 
+// Wake up Render backend on app load (free tier spins down)
+fetch(`${API_URL}/health`).catch(() => {});
+
 async function callAPI(endpoint, method = "GET", body = null) {
   try {
     const options = {
@@ -459,7 +462,11 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     setGenerating(true);
 
     let startResp = null;
-    for (let attempt = 0; attempt < 4; attempt++) {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      if (attempt > 0) {
+        setError(`Despertando el servidor... (intento ${attempt}/4)`);
+        await new Promise(r => setTimeout(r, 15000));
+      }
       startResp = await callAPI("/api/dreams/generate", "POST", {
         text: dreamText,
         userId: user.id,
@@ -471,13 +478,12 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         setError("Ya usaste tus 3 sueños de este mes");
         return;
       }
-      if (startResp?.operationName) break;
-      await new Promise(r => setTimeout(r, 8000));
+      if (startResp?.operationName) { setError(""); break; }
     }
 
     if (!startResp?.operationName) {
       setGenerating(false);
-      setError("El servidor no respondió al iniciar (puede estar despertando). Espera unos segundos e intenta otra vez.");
+      setError("El servidor tardó demasiado en responder. Intenta de nuevo en 1 minuto.");
       return;
     }
 
