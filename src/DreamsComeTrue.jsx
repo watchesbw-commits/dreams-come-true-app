@@ -786,8 +786,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     <div className="astra-sonar-preview-col">
       {!isBusy && (
         (() => {
-          const demoDreams = DREAM_VIDEO_FILES.map((f, i) => ({ video_url: `/videos/${encodeURIComponent(f)}`, text: null, _demo: true, id: `demo-${i}` }));
-          const displayDreams = [...pastDreams, ...demoDreams];
+          const displayDreams = DREAM_VIDEO_FILES.map((f, i) => ({ video_url: `/videos/${encodeURIComponent(f)}`, text: null, _demo: true, id: `demo-${i}` }));
           const activeItem = displayDreams[activePastIdx] || displayDreams[0];
           return (
             <div className="glass-card" style={{ overflow: "hidden" }}>
