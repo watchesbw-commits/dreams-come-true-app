@@ -647,24 +647,24 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           <input ref={faceInputRef} type="file" accept="image/*" onChange={handleFaceFileChange} style={{ display: "none" }} />
         </div>
         {faceError && <div style={{ marginTop: 8, fontSize: 11, color: t.errorText }}>{faceError}</div>}
-      </div>
 
-      {/* Prompt suggestions */}
-      <div style={{ padding: "0 16px", marginBottom: 16, display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {SUGGESTIONS.map(s => (
-          <div
-            key={s}
-            onClick={() => { setDreamText(s); setError(""); }}
-            style={{
-              padding: "6px 12px", borderRadius: 20, cursor: "pointer",
-              background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
-              fontSize: 11, color: t.label, transition: "all 0.5s ease",
-              whiteSpace: "nowrap"
-            }}
-          >
-            {s}
-          </div>
-        ))}
+        {/* Prompt suggestions */}
+        <div style={{ borderTop: `1px solid ${t.mutedBorder}`, marginTop: 14, paddingTop: 14, display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {SUGGESTIONS.map(s => (
+            <div
+              key={s}
+              onClick={() => { setDreamText(s); setError(""); }}
+              style={{
+                padding: "6px 12px", borderRadius: 20, cursor: "pointer",
+                background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
+                fontSize: 11, color: t.label, transition: "all 0.5s ease",
+                whiteSpace: "nowrap"
+              }}
+            >
+              {s}
+            </div>
+          ))}
+        </div>
       </div>
 
       {error && (
