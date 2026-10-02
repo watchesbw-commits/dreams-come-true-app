@@ -620,6 +620,33 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           </div>
           <span style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>{dreamText.length}/5000</span>
         </div>
+
+        {/* Foto dentro de la card */}
+        <div style={{ borderTop: `1px solid ${t.mutedBorder}`, marginTop: 14, paddingTop: 14, display: "flex", alignItems: "center", gap: 12 }}>
+          {faceImage ? (
+            <img src={faceImage} alt="Tu rostro" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: `1.5px solid ${t.cardBorder}`, flexShrink: 0 }} />
+          ) : (
+            <div style={{ width: 40, height: 40, borderRadius: "50%", flexShrink: 0, background: t.iconBg, border: `1.5px solid ${t.iconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.5s ease" }}>
+              <IconCamera size={18} stroke={1.5} />
+            </div>
+          )}
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, color: t.label, fontWeight: 600, marginBottom: 4 }}>¿Quieres aparecer en tu sueño?</div>
+            {faceImage && (
+              <div onClick={() => setIncludeFace(!includeFace)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: t.textSecondary }}>Aparecer en mi sueño</span>
+                <div style={{ width: 34, height: 20, borderRadius: 10, position: "relative", flexShrink: 0, background: includeFace ? t.accentGradient : t.toggleOffBg, border: `1.5px solid ${t.mutedBorder}`, transition: "background 0.3s ease" }}>
+                  <div style={{ width: 14, height: 14, borderRadius: "50%", background: "white", position: "absolute", top: 2, left: includeFace ? 17 : 2, transition: "left 0.2s ease" }} />
+                </div>
+              </div>
+            )}
+            <button className="btn-primary" onClick={() => faceInputRef.current?.click()} disabled={uploadingFace} style={{ padding: "6px 12px", fontSize: 11, fontWeight: 500, fontFamily: "inherit", opacity: uploadingFace ? 0.6 : 1 }}>
+              {uploadingFace ? "Subiendo..." : faceImage ? "Cambiar foto" : "Subir foto"}
+            </button>
+          </div>
+          <input ref={faceInputRef} type="file" accept="image/*" onChange={handleFaceFileChange} style={{ display: "none" }} />
+        </div>
+        {faceError && <div style={{ marginTop: 8, fontSize: 11, color: t.errorText }}>{faceError}</div>}
       </div>
 
       {/* Prompt suggestions */}
@@ -650,65 +677,6 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         </div>
       )}
 
-      {/* Foto del usuario */}
-      <div className="glass-card" style={{ margin: "0 16px 16px", padding: "16px" }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.18em", color: t.label, textTransform: "uppercase", marginBottom: 12, fontWeight: 600, transition: "color 0.5s ease" }}>
-          ¿Quieres aparecer en tu sueño?
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          {faceImage ? (
-            <img
-              src={faceImage}
-              alt="Tu rostro"
-              style={{
-                width: 56, height: 56, borderRadius: "50%", objectFit: "cover",
-                border: `1.5px solid ${t.cardBorder}`, flexShrink: 0
-              }}
-            />
-          ) : (
-            <div style={{
-              width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
-              background: t.iconBg, border: `1.5px solid ${t.iconBorder}`,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, transition: "all 0.5s ease"
-            }}><IconCamera size={22} stroke={1.5} /></div>
-          )}
-
-          <div style={{ flex: 1 }}>
-            {faceImage && (
-              <div
-                onClick={() => setIncludeFace(!includeFace)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", marginBottom: 10 }}
-              >
-                <span style={{ fontSize: 12, fontWeight: 500, color: t.textPrimary, transition: "color 0.5s ease" }}>Aparecer en mi sueño</span>
-                <div style={{
-                  width: 38, height: 22, borderRadius: 11, position: "relative", flexShrink: 0,
-                  background: includeFace ? t.accentGradient : t.toggleOffBg,
-                  border: `1.5px solid ${t.mutedBorder}`, transition: "background 0.3s ease"
-                }}>
-                  <div style={{
-                    width: 16, height: 16, borderRadius: "50%", background: "white",
-                    position: "absolute", top: 2, left: includeFace ? 19 : 2, transition: "left 0.2s ease", boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
-                  }} />
-                </div>
-              </div>
-            )}
-            <button
-              className="btn-primary"
-              onClick={() => faceInputRef.current?.click()}
-              disabled={uploadingFace}
-              style={{
-                padding: "8px 14px", fontSize: 12, fontWeight: 500,
-                fontFamily: "inherit", opacity: uploadingFace ? 0.6 : 1,
-                cursor: uploadingFace ? "default" : "pointer"
-              }}
-            >
-              {uploadingFace ? "Subiendo..." : faceImage ? "Cambiar foto" : "Subir foto"}
-            </button>
-          </div>
-        </div>
-
-        <input
-          ref={faceInputRef}
       <div
         className="glass-card"
         onClick={() => setIsPublic(!isPublic)}
