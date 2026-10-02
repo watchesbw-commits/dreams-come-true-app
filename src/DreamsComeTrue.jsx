@@ -30,12 +30,6 @@ async function callAPI(endpoint, method = "GET", body = null) {
 // ============ DATA & CONSTANTS ============
 const GENERIC_INTERPRETATION = "Tu sueño refleja tu búsqueda de significado y transformación. Cada imagen que ves es un reflejo de tu subconsciente tomando forma.";
 
-const SUGGESTIONS = [
-  "Volaba sobre el océano al amanecer",
-  "Me perseguía una sombra en un bosque",
-  "Flotaba entre nubes de colores",
-  "Exploraba una ciudad sumergida",
-];
 
 const GENERATING_MESSAGES = [
   "Pintando los colores de tu sueño...",
@@ -403,6 +397,35 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
   const [uploadingFace, setUploadingFace] = useState(false);
   const [faceError, setFaceError] = useState("");
   const faceInputRef = useRef(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
+
+  const handleMicClick = useCallback(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError("Tu navegador no soporta reconocimiento de voz. Usa Chrome.");
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "es-ES";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      setDreamText(prev => prev ? prev + " " + transcript : transcript);
+      setError("");
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  }, [isListening]);
 
   const handleFaceFileChange = useCallback(async (e) => {
     const file = e.target.files?.[0];
@@ -421,7 +444,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
       const resp = await callAPI("/api/user/upload-face", "POST", {
         userId,
-        image: base64,
+        imageBase64: base64,
       });
 
       if (resp?.elementId) {
@@ -609,14 +632,17 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           }}
         />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }} onClick={handleMicClick}>
             <div style={{
               width: 32, height: 32, borderRadius: "50%",
-              background: t.iconBg, border: `1.5px solid ${t.iconBorder}`,
+              background: isListening ? "rgba(239,68,68,0.2)" : t.iconBg,
+              border: `1.5px solid ${isListening ? "#ef4444" : t.iconBorder}`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: t.label, fontSize: 16, cursor: "pointer", transition: "all 0.5s ease"
+              color: isListening ? "#ef4444" : t.label, fontSize: 16, cursor: "pointer", transition: "all 0.3s ease"
             }}><IconMicrophone size={16} stroke={1.5} /></div>
-            <span style={{ fontSize: 11, color: t.textSecondary, transition: "color 0.5s ease" }}>o di tu sueño</span>
+            <span style={{ fontSize: 11, color: isListening ? "#ef4444" : t.textSecondary, transition: "color 0.3s ease" }}>
+              {isListening ? "Escuchando... (toca para parar)" : "o di tu sueño"}
+            </span>
           </div>
           <span style={{ fontSize: 10, color: t.textSecondary, transition: "color 0.5s ease" }}>{dreamText.length}/5000</span>
         </div>
@@ -648,23 +674,6 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         </div>
         {faceError && <div style={{ marginTop: 8, fontSize: 11, color: t.errorText }}>{faceError}</div>}
 
-        {/* Prompt suggestions */}
-        <div style={{ borderTop: `1px solid ${t.mutedBorder}`, marginTop: 14, paddingTop: 14, display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {SUGGESTIONS.map(s => (
-            <div
-              key={s}
-              onClick={() => { setDreamText(s); setError(""); }}
-              style={{
-                padding: "6px 12px", borderRadius: 20, cursor: "pointer",
-                background: t.mutedBg, border: `1.5px solid ${t.mutedBorder}`,
-                fontSize: 11, color: t.label, transition: "all 0.5s ease",
-                whiteSpace: "nowrap"
-              }}
-            >
-              {s}
-            </div>
-          ))}
-        </div>
       </div>
 
       {error && (
