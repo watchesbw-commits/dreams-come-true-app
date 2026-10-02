@@ -650,42 +650,6 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         </div>
       )}
 
-      {/* Privacy toggle */}
-      <div
-        className="glass-card"
-        onClick={() => setIsPublic(!isPublic)}
-        style={{
-          margin: "0 16px 16px", padding: "14px", cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "space-between"
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 10,
-            background: isPublic ? t.iconBg : t.mutedBg,
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, transition: "all 0.5s ease"
-          }}>{isPublic ? <IconWorld size={18} stroke={1.5} /> : <IconShieldLock size={18} stroke={1.5} />}</div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: t.textPrimary, transition: "color 0.5s ease" }}>
-              {isPublic ? "Compartir en Universo" : "Solo para ti"}
-            </div>
-            <div style={{ fontSize: 11, color: t.textSecondary, marginTop: 2, transition: "color 0.5s ease" }}>
-              {isPublic ? "Otros verán tu sueño" : "Solo tú verás esto"}
-            </div>
-          </div>
-        </div>
-        <div style={{
-          width: 38, height: 22, borderRadius: 11, position: "relative",
-          background: isPublic ? t.accentGradient : t.toggleOffBg,
-          border: `1.5px solid ${t.mutedBorder}`, transition: "background 0.3s ease"
-        }}>
-          <div style={{
-            width: 16, height: 16, borderRadius: "50%", background: "white",
-            position: "absolute", top: 2, left: isPublic ? 19 : 2, transition: "left 0.2s ease", boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
-          }} />
-        </div>
-      </div>
-
       {/* Foto del usuario */}
       <div className="glass-card" style={{ margin: "0 16px 16px", padding: "16px" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.18em", color: t.label, textTransform: "uppercase", marginBottom: 12, fontWeight: 600, transition: "color 0.5s ease" }}>
@@ -745,15 +709,39 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
         <input
           ref={faceInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFaceFileChange}
-          style={{ display: "none" }}
-        />
-
-        {faceError && (
-          <div style={{ marginTop: 10, fontSize: 11, color: t.errorText, transition: "color 0.5s ease" }}>{faceError}</div>
-        )}
+      <div
+        className="glass-card"
+        onClick={() => setIsPublic(!isPublic)}
+        style={{
+          margin: "0 16px 16px", padding: "14px", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "space-between"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 10,
+            background: isPublic ? t.iconBg : t.mutedBg,
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, transition: "all 0.5s ease"
+          }}>{isPublic ? <IconWorld size={18} stroke={1.5} /> : <IconShieldLock size={18} stroke={1.5} />}</div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: t.textPrimary, transition: "color 0.5s ease" }}>
+              {isPublic ? "Compartir en Universo" : "Solo para ti"}
+            </div>
+            <div style={{ fontSize: 11, color: t.textSecondary, marginTop: 2, transition: "color 0.5s ease" }}>
+              {isPublic ? "Otros verán tu sueño" : "Solo tú verás esto"}
+            </div>
+          </div>
+        </div>
+        <div style={{
+          width: 38, height: 22, borderRadius: 11, position: "relative",
+          background: isPublic ? t.accentGradient : t.toggleOffBg,
+          border: `1.5px solid ${t.mutedBorder}`, transition: "background 0.3s ease"
+        }}>
+          <div style={{
+            width: 16, height: 16, borderRadius: "50%", background: "white",
+            position: "absolute", top: 2, left: isPublic ? 19 : 2, transition: "left 0.2s ease", boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
+          }} />
+        </div>
       </div>
 
       {showSubscribeButton ? (
