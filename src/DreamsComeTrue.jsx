@@ -208,6 +208,7 @@ function GlobalStyles({ isDarkMode }) {
       .astra-app-shell { max-width: 430px; }
       .astra-sidebar { display: none; }
       .astra-sonar-preview-col { display: none; }
+      .astra-mobile-demo-carousel { display: block; }
       .universo-card-media { aspect-ratio: 16 / 9; }
 
       .astra-hide-mobile-busy { display: none; }
@@ -251,6 +252,7 @@ function GlobalStyles({ isDarkMode }) {
           position: sticky;
           top: 24px;
         }
+        .astra-mobile-demo-carousel { display: none; }
 
         .astra-universo-grid {
           display: grid;
@@ -593,6 +595,27 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           fontSize: 13, color: t.successText, textAlign: "center", fontWeight: 500
         }}>
           {subscriptionMessage}
+        </div>
+      )}
+
+      {/* Mobile demo carousel (hidden on desktop where the sidebar handles it) */}
+      {!isBusy && (
+        <div className="astra-mobile-demo-carousel" style={{ margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative" }}>
+          <video
+            key={DREAM_VIDEO_FILES[activePastIdx] || DREAM_VIDEO_FILES[0]}
+            src={`/videos/${encodeURIComponent(DREAM_VIDEO_FILES[activePastIdx] || DREAM_VIDEO_FILES[0])}`}
+            autoPlay muted loop playsInline
+            style={{ width: "100%", height: 220, objectFit: "cover", display: "block", background: "#000" }}
+          />
+          <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 6 }}>
+            {DREAM_VIDEO_FILES.map((_, i) => (
+              <div key={i} onClick={() => setActivePastIdx(i)} style={{
+                width: 7, height: 7, borderRadius: "50%", cursor: "pointer",
+                background: i === activePastIdx ? "#fff" : "rgba(255,255,255,0.35)",
+                transition: "background 0.2s"
+              }} />
+            ))}
+          </div>
         </div>
       )}
 
