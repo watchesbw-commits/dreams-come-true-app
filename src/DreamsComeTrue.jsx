@@ -1523,7 +1523,7 @@ function LoginScreen({ isDarkMode }) {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "16px 20px", position: "relative", zIndex: 4,
         }}>
-          <img src="/onira-logo.webp" alt="Onira" style={{ height: 36 }} />
+          <img src="/onira-logo.webp" alt="Onira" style={{ height: 56, mixBlendMode: "screen" }} />
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={openSignIn} style={{ ...pillBtnBase, background: "#ffffff", color: "#000000" }}>
               Iniciar sesión
@@ -1805,7 +1805,7 @@ export default function Onira() {
       {/* Desktop-only sidebar (hidden on mobile) */}
       <div className="astra-sidebar">
         <div style={{ marginBottom: 32, padding: "0 8px" }}>
-          <img src="/onira-logo.webp" alt="Onira" style={{ height: 32 }} />
+          <img src="/onira-logo.webp" alt="Onira" style={{ height: 52, mixBlendMode: "screen" }} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
           {tabs.map(tb => (
