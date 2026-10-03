@@ -1332,15 +1332,12 @@ function ProfileScreen({ user, onUpgrade, isDarkMode }) {
   const [infoMessage, setInfoMessage] = useState("");
 
   const menuItems = [
-    { icon: "📷", label: "Foto para face swap", desc: "Próximamente", badge: true },
     { icon: "🔒", label: "Privacidad", desc: "Control total" },
     { icon: "📞", label: "Soporte", desc: "Contáctanos" },
   ];
 
   const handleItemClick = (label) => {
-    if (label === "Foto para face swap") {
-      setInfoMessage("Esta función estará disponible pronto");
-    } else if (label === "Privacidad") {
+    if (label === "Privacidad") {
       setInfoMessage("Tus datos están protegidos. No compartimos tu información con terceros.");
     } else if (label === "Soporte") {
       window.location.href = "mailto:soporte@dreamscometrue.app";
