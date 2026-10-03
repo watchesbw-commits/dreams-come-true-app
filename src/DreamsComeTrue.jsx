@@ -1094,86 +1094,97 @@ function ResultScreen({ dream, user, onBack, isDarkMode }) {
 }
 
 // ============ DIARIO SCREEN ============
-function DiarioScreen({ dreams, isDarkMode }) {
+function DiarioScreen({ userId, isDarkMode }) {
   const t = getTheme(isDarkMode);
-  const [filter, setFilter] = useState("all");
+  const [dreams, setDreams] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDream, setSelectedDream] = useState(null);
 
-  const filteredDreams = useMemo(() => {
-    if (filter === "all") return dreams;
-    if (filter === "public") return dreams.filter(d => d.isPublic);
-    return dreams.filter(d => !d.isPublic);
-  }, [dreams, filter]);
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    callAPI(`/api/dreams/user/${userId}?limit=50`).then(res => {
+      if (res?.dreams) setDreams(res.dreams);
+      setLoading(false);
+    });
+  }, [userId]);
 
-  const stats = useMemo(() => ({
-    total: dreams.length,
-    public: dreams.filter(d => d.isPublic).length,
-    hours: (dreams.reduce((sum, d) => sum + (d.duration || 8), 0) / 60).toFixed(1)
-  }), [dreams]);
+  const formatDate = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    return d.toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" });
+  };
 
   return (
     <div style={{ padding: "20px 0" }}>
       <div style={{ padding: "0 24px 20px" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 32, fontWeight: 300, color: t.textPrimary, letterSpacing: "-0.02em", marginBottom: 8, transition: "color 0.5s ease" }}>
+        <div style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: 32, fontWeight: 300, color: t.textPrimary, letterSpacing: "-0.02em", marginBottom: 8, transition: "color 0.5s ease" }}>
           Tu <em style={{ fontStyle: "italic", background: t.accentGradient, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>diario</em>.
         </div>
         <div style={{ fontSize: 13, color: t.textSecondary, transition: "color 0.5s ease" }}>
-          {stats.total} sueño{stats.total !== 1 ? "s" : ""} materializados
+          {loading ? "Cargando..." : `${dreams.length} sueño${dreams.length !== 1 ? "s" : ""} materializado${dreams.length !== 1 ? "s" : ""}`}
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, padding: "0 16px", marginBottom: 20 }}>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, padding: "0 16px", marginBottom: 20 }}>
         {[
-          { num: stats.total, label: "Sueños" },
-          { num: stats.public, label: "Públicos" },
-          { num: `${stats.hours}h`, label: "Video" },
+          { num: dreams.length, label: "Sueños" },
+          { num: `${(dreams.length * 4)}s`, label: "Video total" },
         ].map((item, i) => (
           <div key={i} className="glass-card" style={{ padding: "14px 0", textAlign: "center" }}>
-            <div style={{
-              fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 300,
-              background: t.accentGradient,
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
-            }}>{item.num}</div>
-            <div style={{ fontSize: 10, color: t.textSecondary, marginTop: 4, transition: "color 0.5s ease" }}>{item.label}</div>
+            <div style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: 22, fontWeight: 300, background: t.accentGradient, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{item.num}</div>
+            <div style={{ fontSize: 10, color: t.textSecondary, marginTop: 4 }}>{item.label}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 16 }}>
-        {["all", "public", "private"].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            flex: 1, padding: "10px", borderRadius: 10, border: `1.5px solid ${t.mutedBorder}`,
-            background: filter === f ? t.mutedBg : t.cardBg,
-            color: filter === f ? t.label : t.textSecondary,
-            fontSize: 12, cursor: "pointer", transition: "all 0.5s ease", fontWeight: 500, fontFamily: "inherit"
-          }}>
-            {f === "all" ? "Todos" : f === "public" ? "Públicos" : "Privados"}
-          </button>
-        ))}
-      </div>
+      {/* Dream expanded player */}
+      {selectedDream && (
+        <div style={{ margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative" }}>
+          <video
+            src={selectedDream.video_url}
+            autoPlay loop controls
+            style={{ width: "100%", display: "block", borderRadius: 16, maxHeight: 300, objectFit: "cover", background: "#000" }}
+          />
+          <div style={{ padding: "10px 12px 0" }}>
+            <div style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: 13, fontStyle: "italic", color: t.textPrimary, lineHeight: 1.4 }}>"{selectedDream.text}"</div>
+            <div style={{ fontSize: 11, color: t.textSecondary, marginTop: 4 }}>{formatDate(selectedDream.created_at)}</div>
+          </div>
+          <button onClick={() => setSelectedDream(null)} style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: "rgba(0,0,0,0.6)", border: "none", color: "#fff", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+        </div>
+      )}
 
+      {/* Dream list */}
       <div style={{ padding: "0 16px" }}>
-        {filteredDreams.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px 20px", color: t.textSecondary, fontSize: 14 }}>Cargando tus sueños...</div>
+        ) : dreams.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 20px", color: t.textSecondary, fontSize: 14 }}>
-            No hay sueños aquí
+            <div style={{ fontSize: 32, marginBottom: 12 }}>🌙</div>
+            Aún no has materializado ningún sueño
           </div>
         ) : (
-          filteredDreams.map(d => (
-            <div key={d.id} style={{
-              display: "flex", gap: 12, padding: "14px 0",
-              borderBottom: `1.5px solid ${t.mutedBorder}`,
+          dreams.map(d => (
+            <div key={d.id} onClick={() => setSelectedDream(selectedDream?.id === d.id ? null : d)} style={{
+              display: "flex", gap: 12, padding: "12px 0",
+              borderBottom: `1px solid ${t.mutedBorder}`,
+              cursor: "pointer"
             }}>
-              <div className="glass-card" style={{ width: 56, height: 56, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
-                🌙
+              {/* Video thumbnail */}
+              <div style={{ width: 72, height: 72, flexShrink: 0, borderRadius: 10, overflow: "hidden", background: "#111", border: `1.5px solid ${selectedDream?.id === d.id ? "#4F7FFF" : t.mutedBorder}`, transition: "border-color 0.2s" }}>
+                <video
+                  src={d.video_url}
+                  muted playsInline
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: "Georgia, serif", fontSize: 14, fontStyle: "italic", color: t.textPrimary, lineHeight: 1.3, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.5s ease" }}>
+              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <div style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: 13, fontStyle: "italic", color: t.textPrimary, lineHeight: 1.3, marginBottom: 5, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
                   "{d.text}"
                 </div>
-                <div style={{ fontSize: 11, color: t.textSecondary, display: "flex", gap: 8, alignItems: "center", transition: "color 0.5s ease" }}>
-                  <span>{d.createdAt}</span>
-                  <span>·</span>
-                  <span>8s</span>
-                  <span style={{ marginLeft: "auto" }}>{d.isPublic ? "🌍" : "🔒"}</span>
+                <div style={{ fontSize: 11, color: t.textSecondary }}>
+                  {formatDate(d.created_at)} · 4s
                 </div>
               </div>
             </div>
@@ -1815,7 +1826,7 @@ export default function Astra() {
             isDarkMode={isDarkMode}
           />
         )}
-        {tab === "diario" && <DiarioScreen dreams={dreams} isDarkMode={isDarkMode} />}
+        {tab === "diario" && <DiarioScreen userId={clerkUser?.id} isDarkMode={isDarkMode} />}
         {tab === "universo" && <UniversoScreen isDarkMode={isDarkMode} />}
         {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} isDarkMode={isDarkMode} />}
       </div>
