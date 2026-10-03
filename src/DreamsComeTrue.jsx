@@ -1486,7 +1486,7 @@ function ProfileScreen({ user, onUpgrade, isDarkMode }) {
       </div>
 
       <div style={{ textAlign: "center", padding: "32px 24px 16px", fontSize: 11, color: t.inactiveTab, transition: "color 0.5s ease" }}>
-        Astra · v1.3.0<br />Hecho con magia ✨ en México
+        Onira · v1.3.0<br />Hecho con magia ✨ en México
       </div>
     </div>
   );
@@ -1523,9 +1523,7 @@ function LoginScreen({ isDarkMode }) {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "16px 20px", position: "relative", zIndex: 4,
         }}>
-          <div style={{ color: "#ffffff", fontFamily: "Georgia, serif", fontSize: 22 }}>
-            ✦ Astra
-          </div>
+          <img src="/onira-logo.webp" alt="Onira" style={{ height: 36 }} />
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={openSignIn} style={{ ...pillBtnBase, background: "#ffffff", color: "#000000" }}>
               Iniciar sesión
@@ -1706,7 +1704,7 @@ function LoginScreen({ isDarkMode }) {
 }
 
 // ============ MAIN APP ============
-export default function Astra() {
+export default function Onira() {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const [tab, setTab] = useState("sonar");
   const isDarkMode = true;
@@ -1806,8 +1804,8 @@ export default function Astra() {
 
       {/* Desktop-only sidebar (hidden on mobile) */}
       <div className="astra-sidebar">
-        <div style={{ color: t.textPrimary, fontFamily: "Georgia, serif", fontSize: 20, marginBottom: 32, padding: "0 8px" }}>
-          ✦ Astra
+        <div style={{ marginBottom: 32, padding: "0 8px" }}>
+          <img src="/onira-logo.webp" alt="Onira" style={{ height: 32 }} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
           {tabs.map(tb => (
