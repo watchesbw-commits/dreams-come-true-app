@@ -306,7 +306,7 @@ function GlobalStyles({ isDarkMode }) {
   );
 }
 
-const DREAM_VIDEO_FILES = ["video 1.mp4", "video 2.mp4", "video 3.mp4", "video 4.mp4"];
+const DREAM_VIDEO_FILES = ["video 1.mp4"];
 
 function DreamHero() {
   const [index, setIndex] = useState(0);
