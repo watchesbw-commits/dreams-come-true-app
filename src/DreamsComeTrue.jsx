@@ -6,7 +6,7 @@ import {
 } from "@tabler/icons-react";
 
 // ============ BACKEND ============
-const API_URL = import.meta.env.VITE_BACKEND_URL || "https://dreams-come-true-backend.onrender.com";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "https://astra-backend-bddp.onrender.com";
 
 // Wake up Render backend on app load (free tier spins down)
 fetch(`${API_URL}/health`).catch(() => {});
