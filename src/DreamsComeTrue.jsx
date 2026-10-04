@@ -1493,7 +1493,7 @@ function ProfileScreen({ user, onUpgrade, isDarkMode }) {
 }
 
 // ============ LOGIN SCREEN ============
-const LIME = "#D4FF3D";
+const LIME = "#4F7FFF";
 
 function LoginScreen({ isDarkMode }) {
   const t = getTheme(isDarkMode);
@@ -1511,7 +1511,7 @@ function LoginScreen({ isDarkMode }) {
 
       {/* Promo banner */}
       <div style={{
-        background: LIME, color: "#000000", textAlign: "center",
+        background: "rgba(79,127,255,0.2)", color: "#ffffff", textAlign: "center",
         padding: "8px 16px", fontSize: 12.5, fontWeight: 600,
       }}>
         🎁 Regístrate y obtén un descuento extra
@@ -1528,7 +1528,7 @@ function LoginScreen({ isDarkMode }) {
             <button onClick={openSignIn} style={{ ...pillBtnBase, background: "#ffffff", color: "#000000" }}>
               Iniciar sesión
             </button>
-            <button onClick={openSignIn} style={{ ...pillBtnBase, background: LIME, color: "#000000" }}>
+            <button onClick={openSignIn} style={{ ...pillBtnBase, background: LIME, color: "#ffffff" }}>
               Comenzar
             </button>
           </div>
@@ -1555,14 +1555,14 @@ function LoginScreen({ isDarkMode }) {
             Convierte lo que soñaste anoche en un video cinematográfico con inteligencia artificial.
           </p>
           <div style={{ display: "flex", gap: 12 }}>
-            <button onClick={openSignIn} style={{ ...pillBtnBase, padding: "14px 28px", fontSize: 15, background: "#ffffff", color: "#000000" }}>
+            <button onClick={openSignIn} style={{ ...pillBtnBase, padding: "14px 28px", fontSize: 15, background: LIME, color: "#ffffff" }}>
               Probar gratis
             </button>
             <button
               onClick={openSignIn}
               style={{
                 ...pillBtnBase, padding: "14px 28px", fontSize: 15,
-                background: "rgba(255,255,255,0.12)", color: "#ffffff", border: "1.5px solid rgba(255,255,255,0.3)",
+                background: "rgba(79,127,255,0.15)", color: "#ffffff", border: "1.5px solid rgba(79,127,255,0.4)",
               }}
             >
               Ver ejemplos
@@ -1587,7 +1587,7 @@ function LoginScreen({ isDarkMode }) {
               onClick={openSignIn}
               style={{
                 ...pillBtnBase, padding: "14px 24px", fontSize: 14,
-                background: "rgba(212,255,61,0.15)", color: LIME,
+                background: "rgba(79,127,255,0.15)", color: LIME,
               }}
             >
               🎁 Regístrate y obtén un descuento extra
@@ -1596,7 +1596,7 @@ function LoginScreen({ isDarkMode }) {
               onClick={openSignIn}
               style={{
                 ...pillBtnBase, padding: "14px 24px", fontSize: 15, fontWeight: 700,
-                background: LIME, color: "#000000",
+                background: LIME, color: "#ffffff",
               }}
             >
               Pruébalo tú mismo →
