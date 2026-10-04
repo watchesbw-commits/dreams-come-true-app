@@ -444,6 +444,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         reader.readAsDataURL(file);
       });
 
+      setFaceError("Conectando con el servidor...");
       const resp = await callAPI("/api/user/upload-face", "POST", {
         userId,
         imageBase64: base64,
@@ -453,11 +454,12 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         setFaceElementId(resp.elementId);
         setFaceImage(base64);
         setIncludeFace(true);
+        setFaceError("");
       } else {
-        setFaceError("No se pudo subir la foto. Intenta de nuevo.");
+        setFaceError(`Error: ${resp?.error || "Respuesta inesperada del servidor"}`);
       }
-    } catch {
-      setFaceError("No se pudo subir la foto. Intenta de nuevo.");
+    } catch (err) {
+      setFaceError(`Error: ${err?.message || "No se pudo conectar al servidor"}`);
     } finally {
       setUploadingFace(false);
       if (faceInputRef.current) faceInputRef.current.value = "";
