@@ -453,7 +453,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         reader.onload = (ev) => {
           const img = new Image();
           img.onload = () => {
-            const MAX = 800;
+            const MAX = 600;
             let { width, height } = img;
             if (width > MAX || height > MAX) {
               if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
@@ -461,8 +461,17 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
             }
             const canvas = document.createElement("canvas");
             canvas.width = width; canvas.height = height;
-            canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL("image/jpeg", 0.8));
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
+            const result = canvas.toDataURL("image/jpeg", 0.7);
+            // Sanity check: debe ser un base64 válido
+            if (!result || result === "data:,") {
+              reject(new Error("Canvas vacío, intenta con otra foto"));
+              return;
+            }
+            resolve(result);
           };
           img.onerror = () => reject(new Error("No se pudo procesar la imagen"));
           img.src = ev.target.result;
