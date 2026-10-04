@@ -30,6 +30,12 @@ async function callAPI(endpoint, method = "GET", body = null) {
 // ============ DATA & CONSTANTS ============
 const GENERIC_INTERPRETATION = "Tu sueño refleja tu búsqueda de significado y transformación. Cada imagen que ves es un reflejo de tu subconsciente tomando forma.";
 
+const PLANES_UI = {
+  basico:  { label: "Básico",   price: "$399",   priceNum: 399,  credits: 3, duration: 8,  icon: "🌙", desc: "3 sueños de 8 segundos al mes", features: ["3 videos HD al mes", "Duración: 8 segundos", "Todos los estilos", "Face swap"] },
+  pro:     { label: "Pro",      price: "$1,199", priceNum: 1199, credits: 5, duration: 15, icon: "⭐", desc: "5 sueños de 15 segundos al mes", features: ["5 videos HD al mes", "Duración: 15 segundos", "Todos los estilos", "Face swap"] },
+  premium: { label: "Premium",  price: "$2,299", priceNum: 2299, credits: 5, duration: 30, icon: "✨", desc: "5 sueños de 30 segundos al mes", features: ["5 videos HD al mes", "Duración: 30 segundos", "Todos los estilos", "Face swap"] },
+};
+
 
 const GENERATING_MESSAGES = [
   "Pintando los colores de tu sueño...",
@@ -768,7 +774,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           display: "flex", alignItems: "center", justifyContent: "center", gap: 10
         }}>
           <IconSparkles size={18} stroke={1.5} />
-          <span style={{ fontSize: 15, fontWeight: 500 }}>Suscribirse — $12.99/mes</span>
+          <span style={{ fontSize: 15, fontWeight: 500 }}>Ver planes de suscripción</span>
         </div>
       ) : (
         <div
@@ -1366,8 +1372,100 @@ function UniversoScreen({ isDarkMode }) {
   );
 }
 
+// ============ PLANES MODAL ============
+function PlanesModal({ isDarkMode, onClose, onSelectPlan, currentPlan }) {
+  const t = getTheme(isDarkMode);
+  const [loading, setLoading] = useState(null);
+
+  const handleSelect = async (planKey) => {
+    setLoading(planKey);
+    await onSelectPlan(planKey);
+    setLoading(null);
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)",
+      display: "flex", alignItems: "flex-end", justifyContent: "center",
+      padding: "0 0 0 0"
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        width: "100%", maxWidth: 480,
+        background: t.bg, borderRadius: "24px 24px 0 0",
+        border: `1.5px solid ${t.cardBorder}`, padding: "28px 20px 36px",
+        maxHeight: "92vh", overflowY: "auto"
+      }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)", margin: "0 auto 24px" }} />
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: t.textPrimary, marginBottom: 6, textAlign: "center" }}>
+          Elige tu plan
+        </div>
+        <div style={{ fontSize: 12, color: t.textSecondary, marginBottom: 24, textAlign: "center" }}>
+          Cancela cuando quieras · Pago en pesos mexicanos
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {Object.entries(PLANES_UI).map(([key, plan]) => {
+            const isActive = currentPlan === key;
+            return (
+              <div key={key} style={{
+                borderRadius: 16, padding: "18px 20px",
+                background: isActive ? "rgba(79,127,255,0.12)" : t.cardBg,
+                border: `1.5px solid ${isActive ? "#4F7FFF" : t.cardBorder}`,
+                cursor: "pointer", transition: "all 0.2s ease"
+              }}
+                onClick={() => !isActive && handleSelect(key)}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: t.textPrimary, marginBottom: 2 }}>
+                      {plan.icon} {plan.label}
+                    </div>
+                    <div style={{ fontSize: 11, color: t.textSecondary }}>{plan.desc}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: t.label }}>{plan.price}</div>
+                    <div style={{ fontSize: 10, color: t.textSecondary }}>MXN/mes</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+                  {plan.features.map((f, i) => (
+                    <span key={i} style={{
+                      fontSize: 10, padding: "3px 8px", borderRadius: 20,
+                      background: "rgba(79,127,255,0.1)", color: t.label,
+                      border: `1px solid rgba(79,127,255,0.2)`
+                    }}>{f}</span>
+                  ))}
+                </div>
+                {isActive ? (
+                  <div style={{ textAlign: "center", fontSize: 12, color: t.successText, fontWeight: 600 }}>
+                    ✓ Plan activo
+                  </div>
+                ) : (
+                  <button className="btn-primary" style={{
+                    width: "100%", padding: "10px", fontSize: 13, fontWeight: 600,
+                    fontFamily: "inherit", opacity: loading ? 0.6 : 1
+                  }} disabled={!!loading}>
+                    {loading === key ? "Cargando..." : `Suscribirse por ${plan.price}/mes`}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <button onClick={onClose} style={{
+          width: "100%", marginTop: 16, padding: "12px", borderRadius: 12,
+          background: "transparent", border: `1.5px solid ${t.mutedBorder}`,
+          color: t.textSecondary, fontSize: 13, cursor: "pointer", fontFamily: "inherit"
+        }}>
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ============ PROFILE SCREEN ============
-function ProfileScreen({ user, onUpgrade, isDarkMode }) {
+function ProfileScreen({ user, userPlan, credits, onUpgrade, isDarkMode }) {
   const t = getTheme(isDarkMode);
   const { signOut } = useClerk();
   const [infoMessage, setInfoMessage] = useState("");
@@ -1419,24 +1517,37 @@ function ProfileScreen({ user, onUpgrade, isDarkMode }) {
       {/* Plan card */}
       <div className="glass-card" style={{ margin: "0 16px 16px", padding: 24 }}>
         <div style={{ fontSize: 10, letterSpacing: "0.18em", color: t.label, marginBottom: 8, textTransform: "uppercase", fontWeight: 600, transition: "color 0.5s ease" }}>TU PLAN</div>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: t.textPrimary, marginBottom: 6, textTransform: "capitalize", transition: "color 0.5s ease" }}>
-          {user.plan === "free" ? "Explorador" : user.plan === "soñador" ? "Soñador" : "Visionario"}
-        </div>
-        <div style={{ fontSize: 12, color: t.textSecondary, marginBottom: 16, lineHeight: 1.5, transition: "color 0.5s ease" }}>
-          {user.plan === "free"
-            ? "1 video de prueba de 8s · Sin face swap"
-            : user.plan === "soñador"
-            ? "3 videos de 8s al mes · Todos los estilos"
-            : "12 videos de 8s · Face swap · 4K"
-          }
-        </div>
-        {user.plan === "free" && (
-          <button className="btn-primary" onClick={onUpgrade} style={{
-            width: "100%", padding: 14, fontSize: 14, fontWeight: 500,
-            fontFamily: "inherit"
-          }}>
-            ✦ Suscribirse — $12.99/mes
-          </button>
+        {userPlan ? (
+          <>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: t.textPrimary, marginBottom: 6, textTransform: "capitalize", transition: "color 0.5s ease" }}>
+              {PLANES_UI[userPlan]?.icon} {PLANES_UI[userPlan]?.label || userPlan}
+            </div>
+            <div style={{ fontSize: 12, color: t.textSecondary, marginBottom: 4, lineHeight: 1.5, transition: "color 0.5s ease" }}>
+              {PLANES_UI[userPlan]?.desc}
+            </div>
+            <div style={{ fontSize: 12, color: t.successText, marginBottom: 16, fontWeight: 500 }}>
+              ✦ {credits !== null ? credits : "..."} sueño{credits !== 1 ? "s" : ""} disponible{credits !== 1 ? "s" : ""} este mes
+            </div>
+            <button className="btn-primary" onClick={onUpgrade} style={{
+              width: "100%", padding: 14, fontSize: 14, fontWeight: 500, fontFamily: "inherit"
+            }}>
+              Ver planes
+            </button>
+          </>
+        ) : (
+          <>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: t.textPrimary, marginBottom: 6, transition: "color 0.5s ease" }}>
+              Sin suscripción
+            </div>
+            <div style={{ fontSize: 12, color: t.textSecondary, marginBottom: 16, lineHeight: 1.5, transition: "color 0.5s ease" }}>
+              Elige un plan para materializar tus sueños
+            </div>
+            <button className="btn-primary" onClick={onUpgrade} style={{
+              width: "100%", padding: 14, fontSize: 14, fontWeight: 500, fontFamily: "inherit"
+            }}>
+              ✦ Ver planes de suscripción
+            </button>
+          </>
         )}
       </div>
 
@@ -1731,6 +1842,8 @@ export default function Onira() {
   const [credits, setCredits] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [subscriptionMessage, setSubscriptionMessage] = useState("");
+  const [userPlan, setUserPlan] = useState(null);
+  const [showPlanes, setShowPlanes] = useState(false);
 
   const user = useMemo(() => ({
     id: clerkUser?.id || "",
@@ -1751,6 +1864,7 @@ export default function Onira() {
       if (!data.error) {
         setCredits(data.credits);
         setSubscriptionStatus(data.subscriptionStatus);
+        if (data.plan) setUserPlan(data.plan);
       }
     });
   }, [isSignedIn, clerkUser?.id]);
@@ -1759,12 +1873,15 @@ export default function Onira() {
     if (!clerkUser?.id) return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("subscribed") === "true") {
+      const planFromUrl = params.get("plan") || "basico";
       window.history.replaceState({}, "", window.location.pathname);
       callAPI(`/credits/${clerkUser.id}`).then(data => {
         if (!data.error) {
           setCredits(data.credits);
           setSubscriptionStatus(data.subscriptionStatus);
-          setSubscriptionMessage("¡Suscripción activada! Tienes 3 sueños");
+          if (data.plan) setUserPlan(data.plan);
+          const p = PLANES_UI[planFromUrl] || PLANES_UI.basico;
+          setSubscriptionMessage(`¡Plan ${p.label} activado! Tienes ${p.credits} sueños`);
         }
       });
     }
@@ -1775,21 +1892,22 @@ export default function Onira() {
     setUserExtras({ plan: updatedUser.plan, credits: updatedUser.credits });
   }, [setDreams, setUserExtras]);
 
-  const handleSubscribe = useCallback(async () => {
+  const handleSubscribe = useCallback(async (planKey) => {
     const data = await callAPI("/create-subscription", "POST", {
       userId: clerkUser?.id,
       userEmail: clerkUser?.primaryEmailAddress?.emailAddress,
+      planKey: planKey || "basico",
     });
     if (data.url) {
       window.location.href = data.url;
-    } else if (data._status === 404 || data.error) {
+    } else if (data.error) {
       alert("El servidor está despertando (puede tardar ~30 segundos). Inténtalo de nuevo.");
     }
   }, [clerkUser]);
 
   const handleUpgrade = useCallback(() => {
-    handleSubscribe();
-  }, [handleSubscribe]);
+    setShowPlanes(true);
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -1857,14 +1975,22 @@ export default function Onira() {
             onDreamCreated={handleDreamCreated}
             credits={credits}
             subscriptionStatus={subscriptionStatus}
-            onSubscribe={handleSubscribe}
+            onSubscribe={() => setShowPlanes(true)}
             subscriptionMessage={subscriptionMessage}
             isDarkMode={isDarkMode}
           />
         )}
         {tab === "diario" && <DiarioScreen userId={clerkUser?.id} isDarkMode={isDarkMode} />}
         {tab === "universo" && <UniversoScreen isDarkMode={isDarkMode} />}
-        {tab === "yo" && <ProfileScreen user={fullUser} onUpgrade={handleUpgrade} isDarkMode={isDarkMode} />}
+        {tab === "yo" && <ProfileScreen user={fullUser} userPlan={userPlan} credits={credits} onUpgrade={handleUpgrade} isDarkMode={isDarkMode} />}
+        {showPlanes && (
+          <PlanesModal
+            isDarkMode={isDarkMode}
+            onClose={() => setShowPlanes(false)}
+            onSelectPlan={(planKey) => { setShowPlanes(false); handleSubscribe(planKey); }}
+            currentPlan={userPlan}
+          />
+        )}
       </div>
 
       <div className="navbar-glass astra-bottom-nav" style={{
