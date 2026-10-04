@@ -41,7 +41,11 @@ const GENERATING_MESSAGES = [
   "Pintando los colores de tu sueño...",
   "Dando vida a tu imaginación...",
   "Tu sueño está tomando forma...",
+  "Tejiendo luz y sombra...",
+  "El subconsciente cobra vida...",
+  "Convirtiendo emociones en imágenes...",
   "Casi listo, tu sueño despierta...",
+  "Los últimos detalles mágicos...",
 ];
 
 const getGreeting = () => {
@@ -881,7 +885,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
     {/* Mobile-only full-screen states (hidden on desktop) */}
     {generating && (
       <div className="astra-mobile-fullscreen">
-        <GeneratingScreen isDarkMode={isDarkMode} />
+        <GeneratingScreen isDarkMode={isDarkMode} done={false} />
       </div>
     )}
     {showResult && resultData && (
@@ -899,10 +903,11 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 }
 
 // ============ GENERATING SCREEN ============
-function GeneratingScreen({ isDarkMode }) {
+function GeneratingScreen({ isDarkMode, done }) {
   const t = getTheme(isDarkMode);
   const [progress, setProgress] = useState(0);
   const [messageIdx, setMessageIdx] = useState(0);
+  const [showDone, setShowDone] = useState(false);
 
   const starPositions = useMemo(() =>
     Array.from({ length: 20 }, (_, i) => ({
@@ -916,20 +921,23 @@ function GeneratingScreen({ isDarkMode }) {
   );
 
   useEffect(() => {
-    // reaches 90% in ~120 seconds: 0.375% per 500ms tick
+    if (done) {
+      setProgress(100);
+      setTimeout(() => setShowDone(true), 600);
+      return;
+    }
+    // llega a 88% en ~120 segundos
     const progressInterval = setInterval(() => {
-      setProgress(p => Math.min(p + 0.375, 90));
+      setProgress(p => Math.min(p + 0.37, 88));
     }, 500);
-
     const messageInterval = setInterval(() => {
       setMessageIdx(i => (i + 1) % GENERATING_MESSAGES.length);
-    }, 20000);
-
+    }, 8000);
     return () => {
       clearInterval(progressInterval);
       clearInterval(messageInterval);
     };
-  }, []);
+  }, [done]);
 
   return (
     <div style={{
@@ -939,14 +947,9 @@ function GeneratingScreen({ isDarkMode }) {
     }}>
       {starPositions.map(star => (
         <div key={star.id} style={{
-          position: "absolute",
-          top: star.top,
-          left: star.left,
-          width: star.size,
-          height: star.size,
-          borderRadius: "50%",
-          background: t.starColor,
-          boxShadow: `0 0 ${star.size * 3}px ${t.starGlow}`,
+          position: "absolute", top: star.top, left: star.left,
+          width: star.size, height: star.size, borderRadius: "50%",
+          background: t.starColor, boxShadow: `0 0 ${star.size * 3}px ${t.starGlow}`,
           animation: `starFloat ${star.duration}s ease-in-out ${star.delay}s infinite alternate`,
           pointerEvents: "none"
         }} />
@@ -954,48 +957,64 @@ function GeneratingScreen({ isDarkMode }) {
 
       <div style={{
         width: 160, height: 160, borderRadius: "50%", marginBottom: 40, position: "relative",
-        background: t.orbGradient,
-        boxShadow: t.orbShadow,
+        background: showDone ? "linear-gradient(135deg, #34d399, #059669)" : t.orbGradient,
+        boxShadow: showDone ? "0 0 80px rgba(52,211,153,0.5)" : t.orbShadow,
         animation: "orbPulse 3s ease-in-out infinite",
-        display: "flex", alignItems: "center", justifyContent: "center"
+        display: "flex", alignItems: "center", justifyContent: "center",
+        transition: "background 0.8s ease, box-shadow 0.8s ease"
       }}>
         <div style={{
           position: "absolute", inset: 12, borderRadius: "50%",
-          border: `1.5px solid ${t.ringColor1}`,
-          animation: "orbRotate 8s linear infinite"
+          border: `1.5px solid ${showDone ? "rgba(52,211,153,0.4)" : t.ringColor1}`,
+          animation: "orbRotate 8s linear infinite", transition: "border-color 0.8s ease"
         }} />
         <div style={{
           position: "absolute", inset: 30, borderRadius: "50%",
-          border: `1.5px solid ${t.ringColor2}`,
-          animation: "orbRotate 12s linear infinite reverse"
+          border: `1.5px solid ${showDone ? "rgba(52,211,153,0.25)" : t.ringColor2}`,
+          animation: "orbRotate 12s linear infinite reverse", transition: "border-color 0.8s ease"
         }} />
-        <span style={{ fontSize: 40, position: "relative", zIndex: 2 }}>✦</span>
+        <span style={{ fontSize: 40, position: "relative", zIndex: 2 }}>
+          {showDone ? "✓" : "✦"}
+        </span>
       </div>
 
       <div style={{
-        fontFamily: "Georgia, serif", fontSize: 18, color: t.label,
-        marginBottom: 14, letterSpacing: "0.06em", transition: "color 0.5s ease"
+        fontFamily: "Georgia, serif", fontSize: 18,
+        color: showDone ? t.successText : t.label,
+        marginBottom: 14, letterSpacing: "0.06em", transition: "color 0.6s ease"
       }}>
-        Generando tu sueño...
+        {showDone ? "¡Tu sueño está listo!" : "Generando tu sueño..."}
       </div>
 
-      <div style={{
-        fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic",
-        color: t.textPrimary, marginBottom: 36, lineHeight: 1.5,
-        minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "0 16px", transition: "color 0.5s ease"
-      }}>
-        {GENERATING_MESSAGES[messageIdx]}
-      </div>
+      {!showDone && (
+        <div style={{
+          fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic",
+          color: t.textPrimary, marginBottom: 36, lineHeight: 1.5,
+          minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "0 16px", transition: "opacity 0.5s ease"
+        }}>
+          {GENERATING_MESSAGES[messageIdx]}
+        </div>
+      )}
+
+      {showDone && (
+        <div style={{
+          fontSize: 13, color: t.textSecondary, marginBottom: 36, lineHeight: 1.6
+        }}>
+          Desliza hacia abajo para ver tu video
+        </div>
+      )}
 
       <div style={{ width: "100%", maxWidth: 280, height: 3, borderRadius: 2, background: t.progressTrackBg, overflow: "hidden", marginBottom: 10 }}>
         <div style={{
           height: "100%", borderRadius: 2, transition: "width 0.5s ease",
           width: `${progress}%`,
-          background: t.accentGradient
+          background: showDone ? "linear-gradient(135deg, #34d399, #059669)" : t.accentGradient
         }} />
       </div>
-      <div style={{ fontSize: 12, color: t.textSecondary, transition: "color 0.5s ease" }}>{Math.round(progress)}%</div>
+      <div style={{ fontSize: 12, color: showDone ? t.successText : t.textSecondary, transition: "color 0.6s ease" }}>
+        {showDone ? "100% — Completado" : `${Math.round(progress)}%`}
+      </div>
     </div>
   );
 }
