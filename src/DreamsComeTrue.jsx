@@ -88,30 +88,30 @@ function getTheme(isDarkMode) {
     bg: "#080B14",
     textPrimary: "#ffffff",
     textSecondary: "rgba(200,210,255,0.45)",
-    label: "#7EB3FF",
-    accentGradient: "linear-gradient(135deg, #4F7FFF, #8B5CF6)",
-    accentSolid: "#4F7FFF",
+    label: "#00AAFF",
+    accentGradient: "linear-gradient(135deg, #0099FF, #00C8FF)",
+    accentSolid: "#0099FF",
     cardBg: "rgba(255,255,255,0.04)",
-    cardBorder: "rgba(79,127,255,0.12)",
-    cardShadow: "0 0 0 1px rgba(79,127,255,0.1), 0 4px 24px rgba(0,0,10,0.4)",
-    cardHoverShadow: "0 0 0 1px rgba(79,127,255,0.35), 0 8px 32px rgba(79,127,255,0.15)",
+    cardBorder: "rgba(0,153,255,0.12)",
+    cardShadow: "0 0 0 1px rgba(0,153,255,0.1), 0 4px 24px rgba(0,0,10,0.4)",
+    cardHoverShadow: "0 0 0 1px rgba(0,153,255,0.35), 0 8px 32px rgba(0,153,255,0.15)",
     inputBg: "rgba(255,255,255,0.03)",
-    inputBorder: "rgba(79,127,255,0.18)",
-    inputFocusBorder: "#4F7FFF",
-    inputFocusShadow: "0 0 0 3px rgba(79,127,255,0.2), 0 0 20px rgba(79,127,255,0.12)",
+    inputBorder: "rgba(0,153,255,0.18)",
+    inputFocusBorder: "#0099FF",
+    inputFocusShadow: "0 0 0 3px rgba(0,153,255,0.2), 0 0 20px rgba(0,153,255,0.12)",
     placeholder: "rgba(150,170,255,0.35)",
-    btnGradient: "linear-gradient(135deg, #4F7FFF, #8B5CF6)",
-    btnShadow: "0 2px 16px rgba(79,127,255,0.35)",
-    btnHoverShadow: "0 6px 24px rgba(79,127,255,0.5)",
+    btnGradient: "linear-gradient(135deg, #0099FF, #00C8FF)",
+    btnShadow: "0 2px 16px rgba(0,153,255,0.4)",
+    btnHoverShadow: "0 6px 24px rgba(0,153,255,0.6)",
     navbarBg: "rgba(8,11,20,0.92)",
-    navbarBorder: "rgba(79,127,255,0.12)",
-    pillBg: "rgba(79,127,255,0.12)",
-    pillBorder: "rgba(79,127,255,0.4)",
-    pillText: "#7EB3FF",
+    navbarBorder: "rgba(0,153,255,0.12)",
+    pillBg: "rgba(0,153,255,0.12)",
+    pillBorder: "rgba(0,153,255,0.4)",
+    pillText: "#00AAFF",
     mutedBg: "rgba(255,255,255,0.04)",
     mutedBorder: "rgba(255,255,255,0.08)",
-    iconBg: "rgba(79,127,255,0.12)",
-    iconBorder: "rgba(79,127,255,0.25)",
+    iconBg: "rgba(0,153,255,0.12)",
+    iconBorder: "rgba(0,153,255,0.25)",
     toggleOffBg: "rgba(255,255,255,0.08)",
     errorBg: "rgba(255,80,80,0.1)",
     errorBorder: "rgba(255,80,80,0.35)",
@@ -120,13 +120,13 @@ function getTheme(isDarkMode) {
     successBg: "rgba(52,211,153,0.1)",
     successBorder: "rgba(52,211,153,0.4)",
     inactiveTab: "rgba(200,210,255,0.35)",
-    orbGradient: "radial-gradient(circle, rgba(79,127,255,0.4), rgba(139,92,246,0.2), transparent)",
-    orbShadow: "0 0 80px rgba(79,127,255,0.3), 0 0 140px rgba(139,92,246,0.15)",
-    ringColor1: "rgba(79,127,255,0.25)",
-    ringColor2: "rgba(139,92,246,0.15)",
-    starColor: "#7EB3FF",
-    starGlow: "rgba(79,127,255,0.7)",
-    progressTrackBg: "rgba(79,127,255,0.1)",
+    orbGradient: "radial-gradient(circle, rgba(0,153,255,0.5), rgba(0,200,255,0.2), transparent)",
+    orbShadow: "0 0 80px rgba(0,153,255,0.4), 0 0 140px rgba(0,200,255,0.2)",
+    ringColor1: "rgba(0,153,255,0.3)",
+    ringColor2: "rgba(0,200,255,0.15)",
+    starColor: "#00AAFF",
+    starGlow: "rgba(0,153,255,0.8)",
+    progressTrackBg: "rgba(0,153,255,0.1)",
   };
 }
 
@@ -1466,7 +1466,7 @@ function PlanesModal({ isDarkMode, onClose, onSelectPlan, currentPlan }) {
               <div key={key} style={{
                 borderRadius: 16, padding: "18px 20px",
                 background: isActive ? "rgba(79,127,255,0.12)" : t.cardBg,
-                border: `1.5px solid ${isActive ? "#4F7FFF" : t.cardBorder}`,
+                border: `1.5px solid ${isActive ? "#0099FF" : t.cardBorder}`,
                 cursor: "pointer", transition: "all 0.2s ease"
               }}
                 onClick={() => !isActive && handleSelect(key)}
@@ -1678,7 +1678,7 @@ function ProfileScreen({ user, userPlan, credits, onUpgrade, isDarkMode }) {
 }
 
 // ============ LOGIN SCREEN ============
-const LIME = "#4F7FFF";
+const LIME = "#0099FF";
 
 function LoginScreen({ isDarkMode }) {
   const t = getTheme(isDarkMode);
@@ -1696,7 +1696,7 @@ function LoginScreen({ isDarkMode }) {
 
       {/* Promo banner */}
       <div style={{
-        background: "rgba(79,127,255,0.2)", color: "#ffffff", textAlign: "center",
+        background: "rgba(0,153,255,0.2)", color: "#ffffff", textAlign: "center",
         padding: "8px 16px", fontSize: 12.5, fontWeight: 600,
       }}>
         🎁 Regístrate y obtén un descuento extra
