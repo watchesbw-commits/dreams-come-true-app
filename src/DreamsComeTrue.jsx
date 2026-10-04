@@ -370,6 +370,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
 
   const [dreamText, setDreamText] = useState("");
   const [isPublic, setIsPublic] = useState(false);
+  const [videoFormat, setVideoFormat] = useState("reel");
   const [greeting, setGreeting] = useState(getGreeting);
 
   useEffect(() => {
@@ -524,6 +525,7 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
         text: dreamText,
         userId: user.id,
         isPublic,
+        videoFormat,
         ...(includeFace && faceElementId ? { incluirCara: true, elementId: faceElementId } : {}),
       });
       if (startResp?._status === 402) {
@@ -736,6 +738,32 @@ function SonarScreen({ user, onDreamCreated, credits, subscriptionStatus, onSubs
           {error}
         </div>
       )}
+
+      {/* Selector de formato */}
+      <div className="glass-card" style={{ margin: "0 16px 16px", padding: "14px" }}>
+        <div style={{ fontSize: 11, color: t.label, fontWeight: 600, marginBottom: 10 }}>Formato del video</div>
+        <div style={{ display: "flex", gap: 10 }}>
+          {[
+            { key: "reel", label: "Reel", icon: "▯", ratio: "9:16", desc: "Vertical" },
+            { key: "square", label: "Cuadrado", icon: "□", ratio: "1:1", desc: "Cuadrado" },
+          ].map(f => (
+            <div
+              key={f.key}
+              onClick={() => setVideoFormat(f.key)}
+              style={{
+                flex: 1, padding: "10px 8px", borderRadius: 12, cursor: "pointer", textAlign: "center",
+                background: videoFormat === f.key ? "rgba(79,127,255,0.12)" : t.mutedBg,
+                border: `1.5px solid ${videoFormat === f.key ? "#4F7FFF" : t.mutedBorder}`,
+                transition: "all 0.2s ease"
+              }}
+            >
+              <div style={{ fontSize: 20, marginBottom: 4, lineHeight: 1 }}>{f.icon}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: videoFormat === f.key ? t.label : t.textPrimary }}>{f.label}</div>
+              <div style={{ fontSize: 10, color: t.textSecondary }}>{f.ratio}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div
         className="glass-card"
