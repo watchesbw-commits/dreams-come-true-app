@@ -1,0 +1,12 @@
+{
+  "appId": "app.oniradreams",
+  "appName": "Onira",
+  "webDir": "dist",
+  "server": {
+    "hostname": "oniradreams.app",
+    "androidScheme": "https"
+  },
+  "ios": {
+    "scheme": "Onira"
+  }
+}
