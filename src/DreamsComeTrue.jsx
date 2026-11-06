@@ -1865,7 +1865,7 @@ function AuthModal({ onClose }) {
       if (error) { setErrorMsg(error.message); setLoading(false); }
       else {
         const loginError = await signInWithEmail(email, password);
-        if (loginError) setEmailSent(true);
+        if (loginError) { setEmailSent(true); setLoading(false); }
       }
     } else {
       const error = await signInWithEmail(email, password);
