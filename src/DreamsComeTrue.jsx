@@ -1863,7 +1863,10 @@ function AuthModal({ onClose }) {
     if (mode === "signup") {
       const error = await signUpWithEmail(email, password, name);
       if (error) { setErrorMsg(error.message); setLoading(false); }
-      else setEmailSent(true);
+      else {
+        const loginError = await signInWithEmail(email, password);
+        if (loginError) setEmailSent(true);
+      }
     } else {
       const error = await signInWithEmail(email, password);
       if (error) { setErrorMsg(LANG === "en" ? "Invalid email or password." : "Email o contraseña incorrectos."); setLoading(false); }
